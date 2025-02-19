@@ -32,28 +32,59 @@
     <answer number="1a">
         <!-- Paste your solution to problem 1, part (a) below this line. --><![CDATA[
 
-
+            select A.i, B.j, (A.val + B.val) as "val"
+            from A, B   
+            where A.i = B.i 
+            and A.j = B.j
 
         ]]><!-- End problem 1, part (a). -->
     </answer>
     <answer number="1b">
         <!-- Paste your solution to problem 1, part (b) below this line. --><![CDATA[
 
-
+        select sum(A.val * B.val) as "DotProduct"
+        from A, B
+        where A.j = 0
+        and B.j = 1
+        and A.i = B.i
 
         ]]><!-- End problem 1, part (b). -->
     </answer>
     <answer number="1c">
         <!-- Paste your solution to problem 1, part (c) below this line. --><![CDATA[
 
-
+select A.i, B.j, sum(A.val * B.val) as "val"
+from A join B
+on A.j = B.i
+group by A.i, B.j
 
         ]]><!-- End problem 1, part (c). -->
     </answer>
     <answer number="1d">
         <!-- Paste your solution to problem 1, part (d) below this line. --><![CDATA[
 
+with c as (
+        select A.i, B.j, sum(A.val * B.val) as "val_c"
+        from A join B
+        on A.j = B.i
+        group by A.i, B.j
+),
+a_2 as (
+        select A.i, B.j, sum(A.val * B.val) as "val_a_2"
+        from A A join A B
+        on A.j = B.i
+        group by A.i, B.j
+),
+c_2 as (
+        select A.i, B.j, sum(A.val_c * B.val_c) as "val_c_2"
+        from c A join c B
+        on A.j = B.i
+        group by A.i, B.j
+)
 
+select A.i, B.j, val_a_2 + 2*val_c_2 as "val"
+from a_2 A join c_2 B
+on A.i = B.i and A.j = B.j
 
         ]]><!-- End problem 1, part (d). -->
     </answer>
@@ -64,21 +95,62 @@
     <answer number="2a">
         <!-- Paste your solution to problem 2, part (a) below this line. --><![CDATA[
 
+with holiday_weeks (WeekDate) as (
+    select WeekDate
+    from Holidays
+    where isholiday == "TRUE"
+)
 
+select store, sum(weeklysales) as "AllSales"
+from Sales
+where weekdate in holiday_weeks
+group by store
+order by AllSales desc
+limit 1
 
         ]]><!-- End problem 2, part (a). -->
     </answer>
     <answer number="2b">
         <!-- Paste your solution to problem 2, part (b) below this line. --><![CDATA[
 
+with holiday_weeks as (
+    select WeekDate
+    from Holidays
+    where isholiday == "TRUE"
+),
+holiday_sales as (
+    select WeekDate, sum(weeklysales) as "TotalSales"
+    from Sales
+    where WeekDate in holiday_weeks
+    group by WeekDate
+),
+avg_holiday_sales as (
+    select avg(TotalSales) as "AvgSales"
+    from holiday_sales
+),
+all_sales as (
+    select WeekDate, sum(weeklysales) as "TotalSales"
+    from Sales
+    where WeekDate not in holiday_weeks
+    group by WeekDate
+)
 
+select count(*) as "NumberNonHolidays"
+from all_sales, avg_holiday_sales
+where TotalSales > avg_holiday_sales.AvgSales
 
         ]]><!-- End problem 2, part (b). -->
     </answer>
     <answer number="2c">
         <!-- Paste your solution to problem 2, part (c) below this line. --><![CDATA[
 
-
+select s.type, avg(sl.weeklysales)
+from Stores s join Sales sl
+on s.store = sl.store
+where sl.WeekDate like "%-12-%" 
+    or sl.WeekDate like "%-01-%" 
+    or sl.WeekDate like "%-02-%"
+group by s.type
 
         ]]><!-- End problem 2, part (c). -->
     </answer>
@@ -89,21 +161,64 @@
     <answer number="3a">
         <!-- Paste your solution to problem 3, part (a) below this line. --><![CDATA[
 
+select company, min(distance) as distance
+from (
+    select s.B as company, s.d as distance
+    from streets s
+    where s.A = 'UW-Madison' and s.d <= 10
 
+    union
+
+    select s2.B as company, (s1.d + s2.d) as distance
+    from streets s1 
+    join streets s2 on s1.B = s2.A
+    where s1.A = 'UW-Madison'
+        and (s1.d + s2.d) <= 10
+        and s2.B <> 'UW-Madison'
+
+    union
+
+    select s3.B as company, (s1.d + s2.d + s3.d) as distance
+    from streets s1
+    join streets s2 on s1.B = s2.A
+    join streets s3 on s2.B = s3.A
+    where s1.A = 'UW-Madison'
+        and (s1.d + s2.d + s3.d) <= 10
+        and s2.B not in ('UW-Madison', s1.A)
+        and s3.B not in ('UW-Madison', s1.A, s2.A)
+) as paths
+group by company
 
         ]]><!-- End problem 3, part (a). -->
     </answer>
     <answer number="3b">
         <!-- Paste your solution to problem 3, part (b) below this line. --><![CDATA[
 
+drop view if exists near_uw;
+create view near_uw as
+select distinct A as company, B as via, d as distance, 1 as hops
+from streets 
+where B = 'UW-Madison'
 
+union
+
+select distinct s2.A as company, s1.A as via, (s1.d + s2.d) as distance, 2 as hops
+from streets s1
+join streets s2 on s1.A = s2.B
+where s1.B = 'UW-Madison';
+
+select * from near_uw
 
         ]]><!-- End problem 3, part (b). -->
     </answer>
     <answer number="3c">
         <!-- Paste your solution to problem 3, part (c) below this line. --><![CDATA[
 
-
+select max(s1.d + s2.d + s3.d) AS LongestDistance
+from streets s1
+join streets s2 ON s1.B = s2.A
+join streets s3 ON s2.B = s3.A
+where s1.A = s3.B
 
         ]]><!-- End problem 3, part (c). -->
     </answer>
