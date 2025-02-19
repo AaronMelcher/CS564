@@ -1,0 +1,62 @@
+JSON Parsing
+
+- for each item in items
+      - Item info
+            - ItemID|Name|Category|Currently|Buy_Price|First_Bid|Number_of_Bids|SellerId|Started|Ends|Description
+            
+      - Seller Info
+            - UserID|Location|Country|Rating
+      
+- for each bid in bids
+      - happens per item
+      - Bidder
+            - UserID|Location|Country|Rating
+      
+      - Bid
+            - UserID|Time|Amount
+            
+            
+DB Schema
+
+Item table
+      ItemID            int PK
+      Name              varchar
+      Category          varchar - joined string of all categories
+      Currently         varchar (formatted w/ dollar function) - change to decimal?
+      Buy_Price         varchar (formatted) default "0" - change to decimal?
+      First_Bid         varchar (formatted) - change to decimal?
+      Number_of_Bids    int
+      SellerId          varchar FK to User table
+      Started                 DateTime - use formatting
+      Ends              DateTime - use formatting
+      Description       varchar
+      
+
+Bid table
+      ItemID      int FK to item table
+      UserID      varchar FK to user table (cannot be same as SellerId in Item table)
+      Time  DateTime formatted
+      Amount      varchar formatted - make decimal?
+                  PK is ItemId,UserID
+
+User table
+      UserID            int PK
+      Location    varchar
+      Country           varchar
+      Rating            varchar
+      Type        varchar -> either Seller or Bidder, may not need
+            - most likely remove since bidder can be seller in different auction
+            
+Duplicate Concerns:
+- have we already seen the UID
+      - keep a set of UID
+      - check for existence before processing and adding
+      
+      
+String formatting
+- trim
+- escape double quotes
+- insert quotes at end/beginning
+- if $$ or DateTime, run formatting method
+
+
