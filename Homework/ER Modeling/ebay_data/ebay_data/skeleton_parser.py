@@ -91,6 +91,9 @@ of the necessary SQL tables for your database.
 def parseJson(json_file):
     # track currently added users to deal with duplicates
     users = set()
+    user_result = []
+    item_result = []
+    bid_result = []
     with open(json_file, 'r') as f:
         items = loads(f.read())['Items'] # creates a Python dictionary of Items for the supplied json file
         for item in items:
@@ -117,7 +120,7 @@ def parseJson(json_file):
             item_data.append(format_string(transformDttm(item["Ends"])))
             item_data.append(format_string(item["Description"]))
 
-            item_result = '|'.join(item_data)
+            item_result.append('|'.join(item_data))
 
             # load new Category data (if applicable)
 
@@ -127,45 +130,54 @@ def parseJson(json_file):
                     bid_data = []
                     bid_data.append(item["ItemID"])
                     
-                    bidder_id = format_string(bid["Bidder"]["UserID"])
+                    bidder_id = format_string(bid["Bid"]["Bidder"]["UserID"])
                     bid_data.append(bidder_id)
 
-                    bid_data.append(format_string(transformDttm(bid["Time"])))
-                    bid_data.append(format_string(transformDollar(bid["Amount"])))
+                    bid_data.append(format_string(transformDttm(bid["Bid"]["Time"])))
+                    bid_data.append(format_string(transformDollar(bid["Bid"]["Amount"])))
 
-                    bid_result = "|".join(bid_data)
+                    bid_result.append("|".join(bid_data))
 
                     # load bidder data
                     # make sure user hasnt been loaded previously
                     if bidder_id not in users:
-                        bidder_data = []
-                        bidder_data.append(bidder_id)
-                        bidder_data.append(bid["Bidder"]["Rating"])
-                        bidder_data.append(bid["Bidder"]["Location"])
-                        bidder_data.append(bid["Bidder"]["Country"])
+                        users.add(bidder_id)
+                        user_data = []
+                        user_data.append(bidder_id)
+                        user_data.append(bid["Bid"]["Bidder"]["Rating"])
+                        user_data.append(bid["Bid"]["Bidder"].get("Location", format_string(None)))
+                        user_data.append(bid["Bid"]["Bidder"].get("Country", format_string(None)))
 
-                        bidder_result = "|".join(bidder_data)
+                        user_result.append("|".join(user_data))
 
             # load each part of the Seller information
             # make sure this user hasnt been loaded previously
             seller_id = format_string(item["Seller"]["UserID"])
             if seller_id not in users:
-                seller_data = []
-                seller_data.append(seller_id)
-                seller_data.append(format_string(item["Seller"]["Rating"]))
-                seller_data.append(format_string(item["Location"]))
-                seller_data.append(format_string(item["Country"]))
+                users.add(seller_id)
+                user_data = []
+                user_data.append(seller_id)
+                user_data.append(format_string(item["Seller"]["Rating"]))
+                user_data.append(format_string(item["Location"]))
+                user_data.append(format_string(item["Country"]))
+                user_result.append("|".join(user_data))
+    #Item Table
+    with open("Item.dat", 'w') as item_db:
+        item_db.write("\n".join(item_result))
+    #Bid Table
+    with open("Bid.dat", 'w') as bid_db: 
+        bid_db.write("\n".join(bid_result))
+    #User Table
+    with open("User.dat", 'w') as user_db:
+        user_db.write("\n".join(user_result))
 
-                seller_result = "|".join(seller_data)
-
-            pass
 
 """
 Loops through each json files provided on the command line and passes each file
 to the parser
 """
 def main(argv):
-    argv = ["gang", "C:\\Users\\amelc\\Documents\\Repos\\CS564\\Homework\\ER Modeling\\ebay_data\\ebay_data\\items-0.json"]
+    # argv = ["gang", "C:\\Users\\amelc\\Documents\\Repos\\CS564\\Homework\\ER Modeling\\ebay_data\\ebay_data\\items-0.json"]
     if len(argv) < 2:
         print >> sys.stderr, 'Usage: python skeleton_json_parser.py <path to json files>'
         sys.exit(1)
