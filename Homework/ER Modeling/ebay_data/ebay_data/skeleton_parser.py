@@ -94,6 +94,7 @@ def parseJson(json_file):
     user_result = []
     item_result = []
     bid_result = []
+    category_result = []
     with open(json_file, 'r') as f:
         items = loads(f.read())['Items'] # creates a Python dictionary of Items for the supplied json file
         for item in items:
@@ -122,7 +123,13 @@ def parseJson(json_file):
 
             item_result.append('|'.join(item_data))
 
+            for category in item["Category"]:
+                category_data = []
+                category_data.append(item["ItemID"])
+                category_data.append(category)
+                category_result.append(columnSeparator.join(category_data))
             # load new Category data (if applicable)
+
 
             # iterate through the bids related to the item
             if item["Bids"] is not None:
@@ -161,6 +168,9 @@ def parseJson(json_file):
                 user_data.append(format_string(item["Location"]))
                 user_data.append(format_string(item["Country"]))
                 user_result.append("|".join(user_data))
+
+    
+
     #Item Table
     with open("Item.dat", 'w') as item_db:
         item_db.write("\n".join(item_result))
@@ -171,13 +181,16 @@ def parseJson(json_file):
     with open("User.dat", 'w') as user_db:
         user_db.write("\n".join(user_result))
 
+    #Category Table
+    with open("Category.dat", 'w') as category_db:
+        category_db.write("\n".join(category_result))
+
 
 """
 Loops through each json files provided on the command line and passes each file
 to the parser
 """
 def main(argv):
-    # argv = ["gang", "C:\\Users\\amelc\\Documents\\Repos\\CS564\\Homework\\ER Modeling\\ebay_data\\ebay_data\\items-0.json"]
     if len(argv) < 2:
         print >> sys.stderr, 'Usage: python skeleton_json_parser.py <path to json files>'
         sys.exit(1)
