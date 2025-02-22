@@ -119,6 +119,10 @@ def parseJson(json_file):
 
             item_data.append(format_string(transformDollar(item["First_Bid"])))
             item_data.append(item["Number_of_Bids"])
+
+            seller_id = format_string(item["Seller"]["UserID"])
+            item_data.append(seller_id)
+
             item_data.append(format_string(transformDttm(item["Started"])))
             item_data.append(format_string(transformDttm(item["Ends"])))
             item_data.append(format_string(item["Description"]))
@@ -161,7 +165,6 @@ def parseJson(json_file):
 
             # load each part of the Seller information
             # make sure this user hasnt been loaded previously
-            seller_id = format_string(item["Seller"]["UserID"])
             if seller_id not in users:
                 users.add(seller_id)
                 user_data = []
