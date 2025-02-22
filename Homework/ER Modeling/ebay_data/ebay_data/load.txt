@@ -1,8 +1,0 @@
-.separator |
-.import Item.dat Items
-
-.import User.dat Users
-
-.import Bid.dat Bids
-
-.import Category.dat Categories
