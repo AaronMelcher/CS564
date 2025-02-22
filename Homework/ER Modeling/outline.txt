@@ -21,7 +21,6 @@ DB Schema
 Item table
       ItemID            int PK
       Name              varchar
-      Category          varchar - joined string of all categories
       Currently         varchar (formatted w/ dollar function) - change to decimal?
       Buy_Price         varchar (formatted) default "0" - change to decimal?
       First_Bid         varchar (formatted) - change to decimal?
@@ -45,7 +44,11 @@ User table
       Country           varchar
       Rating            varchar
       Type        varchar -> either Seller or Bidder, may not need
-            - most likely remove since bidder can be seller in different auction
+            - most likely remove since bidder can be seller in different auction --> I AGREE REMOVE
+
+Category table
+    itemID              int FK
+    Category            varchar
             
 Duplicate Concerns:
 - have we already seen the UID
