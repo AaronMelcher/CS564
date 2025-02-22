@@ -83,6 +83,13 @@ def format_string(input: str) -> str:
     formatted = f'"{formatted}"'
     return formatted
 
+# Global Variables
+users = set()
+user_result = []
+item_result = []
+bid_result = []
+category_result = []
+
 """
 Parses a single json file. Currently, there's a loop that iterates over each
 item in the data set. Your job is to extend this functionality to create all
@@ -90,11 +97,6 @@ of the necessary SQL tables for your database.
 """
 def parseJson(json_file):
     # track currently added users to deal with duplicates
-    users = set()
-    user_result = []
-    item_result = []
-    bid_result = []
-    category_result = []
     with open(json_file, 'r') as f:
         items = loads(f.read())['Items'] # creates a Python dictionary of Items for the supplied json file
         for item in items:
@@ -169,21 +171,6 @@ def parseJson(json_file):
                 user_data.append(format_string(item["Country"]))
                 user_result.append("|".join(user_data))
 
-    
-
-    #Item Table
-    with open("Item.dat", 'w') as item_db:
-        item_db.write("\n".join(item_result))
-    #Bid Table
-    with open("Bid.dat", 'w') as bid_db: 
-        bid_db.write("\n".join(bid_result))
-    #User Table
-    with open("User.dat", 'w') as user_db:
-        user_db.write("\n".join(user_result))
-
-    #Category Table
-    with open("Category.dat", 'w') as category_db:
-        category_db.write("\n".join(category_result))
 
 
 """
@@ -199,6 +186,19 @@ def main(argv):
         if isJson(f):
             parseJson(f)
             print ("Success parsing " + f)
+    #Item Table
+    with open("Item.dat", 'w') as item_db:
+        item_db.write("\n".join(item_result))
+    #Bid Table
+    with open("Bid.dat", 'w') as bid_db: 
+        bid_db.write("\n".join(bid_result))
+    #User Table
+    with open("User.dat", 'w') as user_db:
+        user_db.write("\n".join(user_result))
+
+    #Category Table
+    with open("Category.dat", 'w') as category_db:
+        category_db.write("\n".join(category_result))
 
 if __name__ == '__main__':
     main(sys.argv)
