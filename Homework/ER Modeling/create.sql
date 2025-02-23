@@ -21,8 +21,8 @@ create table Bids (
     ItemID      integer not null,
     UserID      text not null,
     [Time]      text not null,
-    Amount      text not null
-    primary key (ItemID, UserID),
+    Amount      text not null,
+    primary key (ItemID, UserID, Amount),
     foreign key (ItemID) references Items(ItemID) on delete cascade,
     foreign key (UserID) references Users(UserID) on delete cascade
 );
@@ -35,6 +35,8 @@ create table Users (
 );
 
 create table Categories (
-    CategoryID  integer primary key,
-    Category    text not null
+    ItemID  integer not null,
+    Category    text not null,
+    primary key(ItemID, Category),
+    foreign key (ItemID) references Items(ItemID) on delete cascade
 );

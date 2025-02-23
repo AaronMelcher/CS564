@@ -129,13 +129,15 @@ def parseJson(json_file):
 
             item_result.append('|'.join(item_data))
 
+            # creates a set for duplicate categories
+            category_set = set()
             for category in item["Category"]:
-                category_data = []
-                category_data.append(item["ItemID"])
-                category_data.append(category)
-                category_result.append(columnSeparator.join(category_data))
-            # load new Category data (if applicable)
-
+                if category not in category_set:
+                    category_set.add(category)
+                    category_data = []
+                    category_data.append(item["ItemID"])
+                    category_data.append(format_string(category))
+                    category_result.append(columnSeparator.join(category_data))
 
             # iterate through the bids related to the item
             if item["Bids"] is not None:
@@ -158,8 +160,8 @@ def parseJson(json_file):
                         user_data = []
                         user_data.append(bidder_id)
                         user_data.append(bid["Bid"]["Bidder"]["Rating"])
-                        user_data.append(bid["Bid"]["Bidder"].get("Location", format_string(None)))
-                        user_data.append(bid["Bid"]["Bidder"].get("Country", format_string(None)))
+                        user_data.append(format_string(bid["Bid"]["Bidder"].get("Location", None)))
+                        user_data.append(format_string(bid["Bid"]["Bidder"].get("Country", None)))
 
                         user_result.append("|".join(user_data))
 

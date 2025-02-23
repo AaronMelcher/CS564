@@ -1,7 +1,10 @@
 .separator |
 .import Item.dat Items
+UPDATE Items SET Buy_Price = null WHERE Buy_Price = 'NULL';
 
 .import User.dat Users
+UPDATE Users SET [Location] = null WHERE [Location] = 'NULL';
+UPDATE Users SET [Country] = null WHERE [Country] = 'NULL';
 
 .import Bid.dat Bids
 
