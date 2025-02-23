@@ -21,9 +21,9 @@ DB Schema
 Item table
       ItemID            int PK
       Name              varchar
-      Currently         varchar (formatted w/ dollar function) - change to decimal?
-      Buy_Price         varchar (formatted) default "0" - change to decimal?
-      First_Bid         varchar (formatted) - change to decimal?
+      Currently         real (formatted w/ dollar function)
+      Buy_Price         real (formatted) default "0"
+      First_Bid         real (formatted)
       Number_of_Bids    int
       SellerId          varchar FK to User table
       Started                 DateTime - use formatting
@@ -42,7 +42,7 @@ User table
       UserID            int PK
       Location    varchar
       Country           varchar
-      Rating            varchar
+      Rating            int
       Type        varchar -> either Seller or Bidder, may not need
             - most likely remove since bidder can be seller in different auction --> I AGREE REMOVE
 

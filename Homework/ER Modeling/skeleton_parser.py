@@ -171,7 +171,7 @@ def parseJson(json_file):
                 users.add(seller_id)
                 user_data = []
                 user_data.append(seller_id)
-                user_data.append(format_string(item["Seller"]["Rating"]))
+                user_data.append(item["Seller"]["Rating"])
                 user_data.append(format_string(item["Location"]))
                 user_data.append(format_string(item["Country"]))
                 user_result.append("|".join(user_data))

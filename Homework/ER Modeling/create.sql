@@ -29,7 +29,7 @@ create table Bids (
 
 create table Users (
     UserID      text primary key,
-    Rating      text not null,
+    Rating      integer not null,
     [Location]  text,
     Country     text
 );
