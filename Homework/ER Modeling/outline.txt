@@ -36,7 +36,7 @@ Bid table
       UserID      varchar FK to user table (cannot be same as SellerId in Item table)
       Time  DateTime formatted
       Amount      varchar formatted - make decimal?
-                  PK is ItemId,UserID
+                  PK is ItemId,UserID,Amount
 
 User table
       UserID            int PK
