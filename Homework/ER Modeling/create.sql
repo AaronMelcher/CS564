@@ -17,10 +17,6 @@ create table Items (
     foreign key (SellerID) references Users(UserID) on delete cascade
 );
 
-UPDATE Items
-SET Buy_Price = NULL
-WHERE Buy_Price = 'NULL';
-
 create table Bids (
     ItemID      integer not null,
     UserID      text not null,
@@ -37,14 +33,6 @@ create table Users (
     [Location]  text,
     Country     text
 );
-
-UPDATE Users
-SET [Location] = NULL
-WHERE [Location] ='NULL'
-
-UPDATE Users
-SET Country = NULL
-WHERE Country = NULL
 
 create table Categories (
     ItemID  integer not null,
