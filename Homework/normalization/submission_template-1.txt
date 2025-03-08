@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<pset>
+
+    <!--
+        CS 564, Spring 2025
+        HOMEWORK 3 SUBMISSION TEMPLATE
+
+        Please copy and paste your SQL queries (and potentially Python and Latex code) 
+	into the appropriate spots below. 
+
+        When submitting SQL queries, please do not include the initial 
+        %sql or %%sql IPython commands. Just include the SQL code.
+
+        DO NOT DELETE THE <![CDATA[ ... ]]> LINES IN EACH <answer> TAG!
+        Doing so will break the autograder. To avoid accidentally breaking
+        something, please leave all existing comments in this template
+        intact in your submission.
+    -->
+
+    <student>
+        <name>
+            <!-- Insert your full name on the line below. -->
+            Aaron Melcher
+        </name>
+        <studentid>
+            <!-- Insert your student ID number below. -->
+            9083077132
+        </studentid>
+    </student>
+
+
+    <!-- BEGIN PROBLEM 1 -->
+    <answer number="1a">
+        <!-- Paste your solution to problem 1, part (a) below this line. --><![CDATA[
+
+            select provider
+            from hospital
+            group by provider
+            having count(*) > 1
+
+        ]]><!-- End problem 1, part (a). -->
+    </answer>
+    <answer number="1b">
+        <!-- Paste your solution to problem 1, part (b) below this line. --><![CDATA[
+
+            select zip
+            from hospital
+            group by zip
+            having count(distinct city) > 1
+            or count(distinct state) > 1
+
+        ]]><!-- End problem 1, part (b). -->
+    </answer>
+    <!-- END PROBLEM 1 -->
+
+
+    <!-- BEGIN PROBLEM 2 -->
+    <answer number="2a">
+        <!-- Paste your solution to problem 2, part (a) below this line. --><![CDATA[
+
+        answer = True
+        explanation = "By computing the closure of \{A,B\} using the Closure Algorithm we can see that \{A,B\} is a superkey for the above relation"
+
+        ]]><!-- End problem 2, part (a). -->
+    </answer>
+    <answer number="2b">
+        <!-- Paste your solution to problem 2, part (b) below this line. --><![CDATA[
+
+        answer = True
+        explanation = "The above decomposition is lossless-join because all subrelation intersections do not produce a key for another subrelation"
+
+        ]]><!-- End problem 2, part (b). -->
+    </answer>    
+    <answer number="2c">
+        <!-- Paste your solution to problem 2, part (c) below this line. --><![CDATA[
+
+        answer = False
+        explanation = "The relation S is not in BCNF because there are functional dependencies where the left hand side is not a superkey for the relation"
+
+        ]]><!-- End problem 2, part (c). -->
+    </answer>
+    <!-- END PROBLEM 2 -->
+
+    <!-- BEGIN PROBLEM 3 -->
+    <answer number="3a">
+        <!-- Paste your solution to problem 3, part (a) below this line. --><![CDATA[
+
+        $$\pi_{name}(\sigma_{affiliation="UW-Madison"}(Person \bowtie_{Person.pid = Author.pid} (Author \bowtie_{Author.artd = Article.artid} (Article \bowtie_{Article.confid = Conference.confid} \sigma_{year=2021} (Conference)))))$$
+
+        ]]><!-- End problem 3, part (a). -->
+    </answer>
+    <answer number="3b">
+        <!-- Paste your solution to problem 3, part (b) below this line. --><![CDATA[
+
+        $$\gamma_{pid, COUNT(A.artid)}((A\bowtie_{A.confid = C.confid} \sigma_{C.name = "PODS"} (C)) \bowtie_{A.artid=U.artid}U)$$
+
+        ]]><!-- End problem 3, part (b). -->
+    </answer>
+    <!-- END PROBLEM 3 -->
+
+</pset>
