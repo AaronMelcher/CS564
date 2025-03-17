@@ -129,15 +129,37 @@ const Status BufMgr::unPinPage(File* file, const int PageNo,
 
 }
 
+/*
+* The first step is to to allocate an empty page in the specified file by invoking the file->allocatePage() method. 
+* This method will return the page number of the newly allocated page. Then allocBuf() is called to obtain a buffer pool frame.
+* Next, an entry is inserted into the hash table and Set() is invoked on the frame to set it up properly. The method returns both the page number
+* of the newly allocated page to the caller via the pageNo parameter and a pointer to the buffer frame allocated for the page via the page parameter.
+* Returns OK if no errors occurred, UNIXERR if a Unix error occurred, BUFFEREXCEEDED if all buffer frames are pinned and HASHTBLERROR if a hash table error occurred.
+*/
 const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page) 
 {
-
-
-
-
-
-
-
+    Status status = OK;
+    // allocate an empty page in the specified file by invoking the file->allocatePage() method
+    status = file->allocatePage(pageNo);
+    if (status != OK) {
+        return status;
+    }
+    // allocBuf() is called to obtain a buffer pool frame.
+    int frame;
+    status = allocBuf(frame);
+    if (status != OK) {
+        return status;
+    }
+    // an entry is inserted into the hash table and Set() is invoked on the frame to set it up properly
+    // insert(const File* file, const int pageNo, const int frameNo)
+    status = hashTable->insert(file, pageNo, frame);
+    if (status != OK) {
+        return status;  // Return a hash table error if insertion failed
+    }
+    bufTable[frame].Set(file, pageNo);
+    page = &bufPool[frame];
+    // Returns OK if no errors occurred
+    return status;
 }
 
 const Status BufMgr::disposePage(File* file, const int pageNo) 
