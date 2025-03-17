@@ -103,11 +103,19 @@ const Status BufMgr::allocBuf(int & frame)
 	
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
+    // Check to see if page is in hash table
+    int frameNo = -1;
+    int frame = -1;
+    Status inTable = hashTable->lookup(file, PageNo, frameNo);
 
-
-
-
-
+    // Case 1: page is NOT in the buffer pool
+    if(inTable != OK) {
+        // Allocate frame
+        Status frameStatus = allocBuf(frame);
+        // Check frame status
+    } else {
+        // Case 2: page is in the buffer pool
+    }
 }
 
 
