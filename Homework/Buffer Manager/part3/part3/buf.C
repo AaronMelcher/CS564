@@ -82,27 +82,25 @@ const Status BufMgr::allocBuf(int & frame)
             BufDesc &curFrame = bufTable[clockHand];
             
             // Check if the frame is available for replacement (pinCnt must be 0)
-            if (curFrame.pinCnt == 0) {
-                if (curFrame.refbit) {
-                    // If refbit is set, clear it (giving it a second chance)
-                    curFrame.refbit = false;
-                } else {
-                    // Frame is unpinned and refbit is already clear,
-                    // so this frame is selected for replacement.
-                    if (curFrame.dirty) {
-                        Status writeStatus = curFrame.file->writePage(curFrame.pageNo, &bufPool[clockHand]);
-                        if (writeStatus != OK) {
-                            return UNIXERR;
-                        }
+            if (curFrame.refbit) {
+                // If refbit is set, clear it (giving it a second chance)
+                curFrame.refbit = false;
+            } else if (curFrame.pinCnt == 0) {
+                // Frame is unpinned and refbit is already clear,
+                // so this frame is selected for replacement.
+                if (curFrame.dirty) {
+                    Status writeStatus = curFrame.file->writePage(curFrame.pageNo, &bufPool[clockHand]);
+                    if (writeStatus != OK) {
+                        return UNIXERR;
                     }
-                    // Remove from hash table and clear the frame
-                    hashTable->remove(curFrame.file, curFrame.pageNo);
-                    curFrame.Clear();
-                    frame = clockHand;
-                    // Advance the clock hand for next use
-                    advanceClock();
-                    return OK;
                 }
+                // Remove from hash table and clear the frame
+                hashTable->remove(curFrame.file, curFrame.pageNo);
+                curFrame.Clear();
+                frame = clockHand;
+                // Advance the clock hand for next use
+                advanceClock();
+                return OK;
             }
             // Advance to next frame and update counter
             advanceClock();
