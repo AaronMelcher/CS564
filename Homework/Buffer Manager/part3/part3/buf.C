@@ -2,7 +2,7 @@
  * Team Members:
  *  Aaron Melcher 9083077132
  *  Krishaan Bhagat 9083130147
- * 
+ *  Collin Krmpotich 9083059254
  * Purpose:
  *  This file acts as our buffer manager, managing the buffer pool.
  */
