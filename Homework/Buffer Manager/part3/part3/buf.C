@@ -65,12 +65,13 @@ BufMgr::~BufMgr() {
 /**
  * Allocates a free frame using the clock algorithm; if necessary, writing a dirty page back to disk. Returns BUFFEREXCEEDED if all buffer frames are pinned,
  * UNIXERR if the call to the I/O layer returned an error when a dirty page was being written to disk and OK otherwise.
- * This private method will get called by the readPage() and allocPage() methods described below. Make sure that if the buffer frame allocated has a valid page in it, 
+ * This private method will get called by the readPage() and allocPage() methods described below. If the buffer frame allocated has a valid page in it, 
  * that you remove the appropriate entry from the hash table
  */
 const Status BufMgr::allocBuf(int & frame) 
 {
-    int framesProcessed = 0; // for tracking purposes
+    advanceClock(); // want to advance clock before while loop starts to use the frame after the most recent one
+    int framesProcessed = 0; // for tracking purposes to prevent a cycle
     while (framesProcessed < numBufs) {
         BufDesc &curFrame = bufTable[clockHand]; // grabs the current frame
         // checks refbit, if set, then remove as per rules
@@ -112,12 +113,18 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
     Status inTable = hashTable->lookup(file, PageNo, frameNo);
 
     // Case 1: page is NOT in the buffer pool
-    if(inTable != OK) {
+    if(inTable != OK) { // frame is still -1
         // Allocate frame
         Status frameStatus = allocBuf(frame);
         // Check frame status
         if(frameStatus != OK) {
             return frameStatus; // Return error if unable to allocate the frame
+        }
+
+        // Are we skipping a step? call the method file->readPage() to read the page from disk into the buffer pool frame --> Krishaan
+        Status readStatus = file->readPage(PageNo, &bufPool[frame]);
+        if (readStatus != OK) {
+            return readStatus;
         }
 
         // insert page into the hash table 
@@ -138,7 +145,6 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
         bufTable[frameNo].pinCnt++;
         // mark refbit
         bufTable[frameNo].refbit = true;
-
         // return ptr to the page
         page = &bufPool[frameNo];
     }
