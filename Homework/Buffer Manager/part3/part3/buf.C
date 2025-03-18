@@ -116,8 +116,9 @@ const Status BufMgr::allocBuf(int & frame)
 
 
 /**
- * Reads the specified PageNo in the File
- * 
+ * Reads the specified PageNo in the specified File
+ * Checks to see if the page is in the buffer pool, and reads from there if in the pool
+ * If not, allocates a buffer frame and reads from the file directly
  */
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
@@ -135,7 +136,7 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
             return frameStatus; // Return error if unable to allocate the frame
         }
 
-        // Are we skipping a step? call the method file->readPage() to read the page from disk into the buffer pool frame --> Krishaan
+        // call the method file->readPage() to read the page from disk into the buffer pool frame
         Status readStatus = file->readPage(PageNo, &bufPool[frame]);
         if (readStatus != OK) {
             return readStatus;
@@ -163,10 +164,14 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
         page = &bufPool[frameNo];
     }
 
+    // return ok if page was succesfully read in
     return OK;
 }
 
-
+/**
+ * Decrements the pinCnt of the frame containing (file, PageNo) and, if dirty == true, sets the dirty bit.  
+ * Returns OK if no errors occurred, HASHNOTFOUND if the page is not in the buffer pool hash table, PAGENOTPINNED if the pin count is already 0.
+ */
 const Status BufMgr::unPinPage(File* file, const int PageNo, 
 			       const bool dirty) 
 {
