@@ -69,36 +69,53 @@ BufMgr::~BufMgr() {
  */
 const Status BufMgr::allocBuf(int & frame) 
 {
-    advanceClock(); // want to advance clock before while loop starts to use the frame after the most recent one
-    int framesProcessed = 0; // for tracking purposes to prevent a cycle
-    while (framesProcessed < numBufs) {
-        BufDesc &curFrame = bufTable[clockHand]; // grabs the current frame
-        // checks refbit, if set, then remove as per rules
-        if (curFrame.refbit) {  
-            curFrame.refbit = false;
-        // checks for unpinned frame, then replace
-        } else if (curFrame.pinCnt == 0) {
-            // write the dirty page back to disk
-            if (curFrame.dirty == true) {
-                Status writeStatus = curFrame.file->writePage(curFrame.pageNo, &(bufPool[clockHand]));
-                // call to the I/O layer returned an error
-                if (writeStatus != OK) {
-                    return UNIXERR;
+    int cycles = 0; // number of complete sweeps through the buffer pool
+
+    // We'll allow up to a fixed number of cycles; if none yields a candidate,
+    // then likely all frames are pinned.
+    const int MAX_CYCLES = 2;  // you can increase this if desired
+
+    while (cycles < MAX_CYCLES) {
+        int framesProcessed = 0;
+        // Process all frames in one complete sweep.
+        while (framesProcessed < numBufs) {
+            BufDesc &curFrame = bufTable[clockHand];
+            
+            // Check if the frame is available for replacement (pinCnt must be 0)
+            if (curFrame.pinCnt == 0) {
+                if (curFrame.refbit) {
+                    // If refbit is set, clear it (giving it a second chance)
+                    curFrame.refbit = false;
+                } else {
+                    // Frame is unpinned and refbit is already clear,
+                    // so this frame is selected for replacement.
+                    if (curFrame.dirty) {
+                        Status writeStatus = curFrame.file->writePage(curFrame.pageNo, &bufPool[clockHand]);
+                        if (writeStatus != OK) {
+                            return UNIXERR;
+                        }
+                    }
+                    // Remove from hash table and clear the frame
+                    hashTable->remove(curFrame.file, curFrame.pageNo);
+                    curFrame.Clear();
+                    frame = clockHand;
+                    // Advance the clock hand for next use
+                    advanceClock();
+                    return OK;
                 }
             }
-            // remove entry from hashtable, then clear it
-            hashTable->remove(curFrame.file, curFrame.pageNo);
-            curFrame.Clear();
-            // return frame
-            frame = clockHand;
-            return OK;
+            // Advance to next frame and update counter
+            advanceClock();
+            framesProcessed++;
         }
-        // go to next frame and advances the clock
-        advanceClock();
-        framesProcessed++;
+        // One complete pass done; increment cycle count.
+        cycles++;
     }
-    return BUFFEREXCEEDED; // all frames are pinned
+    // If after the allowed cycles, no candidate was found,
+    // it means either all frames are pinned or in use.
+    return BUFFEREXCEEDED;
 }
+
 
 /**
  * Reads the specified PageNo in the File
