@@ -271,18 +271,26 @@ const Status BufMgr::flushFile(const File* file)
 
 void BufMgr::printSelf(void) 
 {
-    BufDesc* tmpbuf;
-  
-    cout << endl << "Print buffer...\n";
-    for (int i=0; i<numBufs; i++) {
-        tmpbuf = &(bufTable[i]);
-        cout << i << "\t" << (char*)(&bufPool[i]) 
-             << "\tpinCnt: " << tmpbuf->pinCnt;
-    
-        if (tmpbuf->valid == true)
-            cout << "\tvalid\n";
+    cout << "\nBuffer Manager State:" << endl;
+    for (int i = 0; i < numBufs; i++) {
+        BufDesc* tmpbuf = &(bufTable[i]);
+        cout << "Frame " << i << " (" << (void*)&bufPool[i] << "):" << endl;
+        
+        // Print file pointer if available
+        if (tmpbuf->file)
+            cout << "\tFile Ptr: " << tmpbuf->file << endl;
+        else
+            cout << "\tFile Ptr: NULL" << endl;
+            
+        cout << "\tPage No: " << tmpbuf->pageNo << endl;
+        cout << "\tFrame No: " << tmpbuf->frameNo << endl;
+        cout << "\tPin Count: " << tmpbuf->pinCnt << endl;
+        cout << "\tDirty: " << (tmpbuf->dirty ? "true" : "false") << endl;
+        cout << "\tValid: " << (tmpbuf->valid ? "true" : "false") << endl;
+        cout << "\tRefbit: " << (tmpbuf->refbit ? "true" : "false") << endl;
         cout << endl;
-    };
+    }
 }
+
 
 
