@@ -190,8 +190,10 @@ const Status BufMgr::unPinPage(File* file, const int PageNo,
     // decrement pin cnt
     desc.pinCnt--;
 
-    // set dirty bit to what was passed in
-    desc.dirty = dirty;
+    // set dirty bit if true
+    if(dirty){
+        desc.dirty = dirty;
+    }
 
     return OK;
 }
