@@ -100,7 +100,10 @@ const Status BufMgr::allocBuf(int & frame)
     return BUFFEREXCEEDED; // all frames are pinned
 }
 
-	
+/**
+ * Reads the specified PageNo in the File
+ * 
+ */
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
     // Check to see if page is in hash table
@@ -113,9 +116,34 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
         // Allocate frame
         Status frameStatus = allocBuf(frame);
         // Check frame status
-    } else {
-        // Case 2: page is in the buffer pool
+        if(frameStatus != OK) {
+            return frameStatus; // Return error if unable to allocate the frame
+        }
+
+        // insert page into the hash table 
+        Status insertStatus = hashTable->insert(file, PageNo, frame);
+        if(insertStatus != OK) {
+            return insertStatus;
+        }
+
+        // Init the buffer desc for the frame
+        bufTable[frame].Set(file, PageNo);
+
+        // return pointer to the page in the pool
+        page = &bufPool[frame];
     }
+    // Case 2: page is in the buffer pool 
+    else {
+        // increment pin count
+        bufTable[frameNo].pinCnt++;
+        // mark refbit
+        bufTable[frameNo].refbit = true;
+
+        // return ptr to the page
+        page = &bufPool[frameNo];
+    }
+
+    return OK;
 }
 
 
