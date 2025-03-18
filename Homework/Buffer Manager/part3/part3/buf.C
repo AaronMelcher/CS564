@@ -1,3 +1,10 @@
+/**
+ * Team Members:
+ *  Aaron Melcher 9083077132
+ * 
+ * Purpose:
+ *  
+ */
 #include <memory.h>
 #include <unistd.h>
 #include <errno.h>
@@ -69,25 +76,24 @@ BufMgr::~BufMgr() {
  */
 const Status BufMgr::allocBuf(int & frame) 
 {
-    int cycles = 0; // number of complete sweeps through the buffer pool
+    int cycles = 0; // current cycle
 
-    // We'll allow up to a fixed number of cycles; if none yields a candidate,
-    // then likely all frames are pinned.
-    const int MAX_CYCLES = 2;  // you can increase this if desired
+    // set max cycles to prevent infinite looping (can be modified)
+    const int MAX_CYCLES = 2;
 
     while (cycles < MAX_CYCLES) {
         int framesProcessed = 0;
-        // Process all frames in one complete sweep.
+        // Process all frames
         while (framesProcessed < numBufs) {
             BufDesc &curFrame = bufTable[clockHand];
             
-            // Check if the frame is available for replacement (pinCnt must be 0)
+            // Check if refbit is set
             if (curFrame.refbit) {
-                // If refbit is set, clear it (giving it a second chance)
+                // clear refbit if it is set
                 curFrame.refbit = false;
             } else if (curFrame.pinCnt == 0) {
-                // Frame is unpinned and refbit is already clear,
-                // so this frame is selected for replacement.
+                // frame is unpinned and available for replacement
+                // check if frame is dirty, writing page if necessary
                 if (curFrame.dirty) {
                     Status writeStatus = curFrame.file->writePage(curFrame.pageNo, &bufPool[clockHand]);
                     if (writeStatus != OK) {
@@ -224,8 +230,7 @@ const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page)
     if (status != OK) {
         return status;
     }
-    // an entry is inserted into the hash table and Set() is invoked on the frame to set it up properly
-    // insert(const File* file, const int pageNo, const int frameNo)
+    // setup hashtable entry
     status = hashTable->insert(file, pageNo, frame);
     if (status != OK) {
         return status;  // Return a hash table error if insertion failed
