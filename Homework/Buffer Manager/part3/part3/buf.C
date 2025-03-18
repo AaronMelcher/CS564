@@ -4,7 +4,7 @@
  *  Krishaan Bhagat 9083130147
  * 
  * Purpose:
- *  
+ *  This file acts as our buffer manager, managing the buffer pool.
  */
 #include <memory.h>
 #include <unistd.h>
