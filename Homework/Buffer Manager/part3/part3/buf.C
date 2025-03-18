@@ -63,10 +63,9 @@ BufMgr::~BufMgr() {
 }
 
 /**
- * Allocates a free frame using the clock algorithm; if necessary, writing a dirty page back to disk. Returns BUFFEREXCEEDED if all buffer frames are pinned,
- * UNIXERR if the call to the I/O layer returned an error when a dirty page was being written to disk and OK otherwise.
- * This private method will get called by the readPage() and allocPage() methods described below. If the buffer frame allocated has a valid page in it, 
- * that you remove the appropriate entry from the hash table
+ * Allocates a free frame using the clock algorithm; if necessary, writes a dirty page back to disk. This private method will get called by the readPage()
+ * and allocPage() methods described below. Will clear frame and then return it
+ * @returns OK on success, BUFFEREXCEEDED if all buffer frames are pinned, UNIXERR if the call to the I/O layer returned an error when a dirty page was being written to disk
  */
 const Status BufMgr::allocBuf(int & frame) 
 {
@@ -80,7 +79,7 @@ const Status BufMgr::allocBuf(int & frame)
         // checks for unpinned frame, then replace
         } else if (curFrame.pinCnt == 0) {
             // write the dirty page back to disk
-            if (curFrame.dirty) {
+            if (curFrame.dirty == true) {
                 Status writeStatus = curFrame.file->writePage(curFrame.pageNo, &(bufPool[clockHand]));
                 // call to the I/O layer returned an error
                 if (writeStatus != OK) {
