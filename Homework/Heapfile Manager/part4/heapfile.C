@@ -17,19 +17,50 @@ const Status createHeapFile(const string fileName)
     {
 		// file doesn't exist. First create it and allocate
 		// an empty header page and data page.
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+        status = db.createFile(fileName);
+        if(status != OK){
+            return status;
+        }
+
+        // Open newly created file
+        status = db.openFile(fileName, file);
+        if(status != OK){
+            return status;
+        }
+
+        // Allocate header page
+        status = bufMgr->allocPage(file, hdrPageNo, newPage);
+        if(status != OK) {
+            return status;
+        }
+
+        // Cast header page to proper structure
+        hdrPage = (FileHdrPage*) newPage;
+
+        // Init header page
+        strncpy(hdrPage->fileName, fileName.c_str(), MAXNAMESIZE);
+        hdrPage->fileName[MAXNAMESIZE-1] = '\0';
+
+        // Allocate first data page
+        status = bufMgr->allocPage(file, newPageNo, newPage);
+        if(status != OK){
+            bufMgr->unPinPage(file, hdrPageNo, true);
+            db.closeFile(file);
+            return status;
+        }
+        newPage->init(newPageNo);
+
+        // Continue setting up header page
+        hdrPage->firstPage = newPageNo;
+        hdrPage->lastPage = newPageNo;
+        hdrPage->pageCnt = 2;
+        hdrPage -> recCnt = 0;
+
+        // Keeping in for now, may not need
+        bufMgr->unPinPage(file, hdrPageNo, true);
+        bufMgr->unPinPage(file, newPageNo, true);
+
+        return OK;
     }
     return (FILEEXISTS);
 }
