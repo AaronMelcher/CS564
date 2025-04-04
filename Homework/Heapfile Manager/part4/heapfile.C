@@ -183,37 +183,39 @@ const Status HeapFile::getRecord(const RID & rid, Record & rec)
 {
     Status status;
 
-    // This method returns a record (via the rec structure) given the RID of the record.
-    // The private data members curPage and curPageNo should be used to keep track of the current data page pinned in the buffer pool.
-    // If the desired record is on the currently pinned page, simply invoke curPage->getRecord(rid, rec) to get the record.
+    // If the desired record is on the currently pinned page, simply invoke
+	// curPage->getRecord(rid, rec) to get the record
+	if (curPage != NULL && curPageNo == rid.pageNo) {
+		status = curPage->getRecord(rid, rec);
+		return status;	
+	}
 
-    status = curPage->getRecord(rid, rec);
-    if (status == OK) {
-        return OK;
-    } else {
-
-        // unpin current page
-        if (curPage != NULL) {
-            status = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
-            if (status != OK) {
-                return status;
-            }
-        }
-
-        // read in required page
-        status = bufMgr->readPage(filePtr, rid.pageNo, curPage);
+	// Otherwise, you need to unpin the currently pinned page (assuming a page is pinned) and use
+	// pageNo field of the RID to read the page into the buffer pool.
+	if (curPage != NULL) {
+		status = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
+		curPage = NULL;
         if (status != OK) {
             return status;
         }
+	}
 
-        // bookkeeping
-        curRec = rid;
-        curPageNo = rid.pageNo;
-        curDirtyFlag = false;
+
+	// If yes, you need to read the right page (the one with the requested record on it) into the buffer.
+	//Make sure when you do this you set the fields curPage, curPageNo, curDirtyFlag, and curRec of the HeapFile object appropriately
+	status = bufMgr->readPage(filePtr, rid.pageNo, curPage);
+    if (status != OK) {
+        return status;
     }
 
-    //cout<< "getRecord. record (" << rid.pageNo << "." << rid.slotNo << ")" << endl;
-    return status;
+	curRec = rid;
+    curPageNo = rid.pageNo;
+    curDirtyFlag = false;
+
+	status = curPage->getRecord(rid, rec);
+
+	return status;
+	
 }
 
 HeapFileScan::HeapFileScan(const string & name,
