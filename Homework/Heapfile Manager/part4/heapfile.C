@@ -220,15 +220,15 @@ HeapFileScan::HeapFileScan(const string & name,
 			   Status & status) : HeapFile(name, status)
 {
     filter = NULL;
-    // added initialization of data members
-    offset = 0;
-    length = 0;
-    // not sure about the initialization of enums
-    op = EQ; // default comparison is now equal
-    type = STRING; // default data type is a string
+    // added initialization of data members -- MAY BE UNNEEDED SO I WILL COMMENT OUT
+    // offset = 0;
+    // length = 0;
+    // // not sure about the initialization of enums
+    // op = EQ; // default comparison is now equal
+    // type = STRING; // default data type is a string
 
-    markedPageNo = -1;
-    markedRec = NULLRID;
+    // markedPageNo = -1;
+    // markedRec = NULLRID;
 }
 
 const Status HeapFileScan::startScan(const int offset_,
@@ -311,7 +311,14 @@ const Status HeapFileScan::resetScan()
     return OK;
 }
 
-
+/**
+ * Returns (via the outRid parameter) the RID of the next record that satisfies the scan predicate. The basic idea is to scan the file one page at a time. 
+ * For each page, use the firstRecord() and nextRecord() methods of the Page class to get the rids of all the records on the page. Convert the rid to a 
+ * pointer to the record data and invoke matchRec() to determine if record satisfies the filter associated with the scan. If so, store the rid in curRec
+ * and return curRec. To make things fast, keep the current page pinned until all the records on the page have been processed. Then continue with the next
+ * page in the file.  Since the HeapFileScan class is derived from the HeapFile class it also has all the methods of the HeapFile class as well. Returns OK 
+ * if no errors occurred. Otherwise, return the error code of the first error that occurred.
+ */
 const Status HeapFileScan::scanNext(RID& outRid)
 {
     Status 	status = OK;
@@ -320,16 +327,54 @@ const Status HeapFileScan::scanNext(RID& outRid)
     int 	nextPageNo;
     Record      rec;
 
-    
-	
-	
-	
-	
-	
-	
-	
-	
-	
+    // handle edge case first by setting a curPage if previously set to null
+    if (curPage == NULL) {
+        curPageNo = headerPage->firstPage;
+        status = bufMgr->readPage(filePtr, curPageNo, curPage);
+        if (status != OK) {
+            return status;
+        }
+    }
+    // go into an infinite loop to find next record to satisfy scan predicate
+    while (true) {
+        // scan first record
+        status = curPage->firstRecord(nextRid);
+        if (status != OK) {
+            return status;
+        }
+        // create another loop for all records within the page
+        while (status == OK) {
+            tmpRid = nextRid;
+            // grabs record
+            status = curPage->getRecord(tmpRid, rec);
+            if (status != OK) {
+                return status;
+            }
+            // HIT CASE --> Do I also have to save curRec
+            if (matchRec(rec)) {
+                outRid = tmpRid;
+                curRec = tmpRid;
+                return OK;
+            }
+            status = curPage->nextRecord(tmpRid, nextRid);
+        }
+        // unpin the current page, then move to the next --- Do I need to change dirtyFlag?
+        status = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
+        if (status != OK) {
+            return status;
+        }
+        // check next page
+        status = curPage->getNextPage(nextPageNo);
+        if (status != OK) {
+            return status;
+        }
+        curPageNo = nextPageNo; // updates current page Number
+        status = bufMgr->readPage(filePtr, curPageNo, curPage);
+        if (status != OK) {
+            return status; // Error reading next page
+        }
+    }
+    return BUFFEREXCEEDED; // should never hit this case
 }
 
 
