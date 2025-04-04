@@ -173,7 +173,7 @@ const Status HeapFile::getRecord(const RID & rid, Record & rec)
         }
 
         // bookkeeping
-        curRec = rec;
+        curRec = rid;
         curPageNo = rid.pageNo;
         curDirtyFlag = false;
     }
