@@ -72,6 +72,14 @@ const Status destroyHeapFile(const string fileName)
 }
 
 // constructor opens the underlying file
+
+/**
+ * This method first opens the appropriate file by calling db.openFile() (do not forget to save the File* returned in the filePtr data member). 
+ * Next, it reads and pins the header page for the file in the buffer pool, initializing the private data members headerPage, headerPageNo, and hdrDirtyFlag.
+ * You might be wondering how you get the page number of the header page. This is what file->getFirstPage() is used for (see description of the I/O layer)! 
+ * Finally, read and pin the first page of the file into the buffer pool, initializing the values of curPage, curPageNo, and curDirtyFlag appropriately.
+ * Set curRec to NULLRID.
+ */
 HeapFile::HeapFile(const string & fileName, Status& returnStatus)
 {
     Status 	status;
@@ -82,17 +90,43 @@ HeapFile::HeapFile(const string & fileName, Status& returnStatus)
     // open the file and read in the header page and the first data page
     if ((status = db.openFile(fileName, filePtr)) == OK)
     {
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+        // Grabs the header Page Number
+		if ((status = filePtr->getFirstPage(headerPageNo)) == OK)
+        {
+            // next step - read page
+            if ((status = bufMgr->readPage(filePtr, headerPageNo, pagePtr)) == OK)
+            {
+                // pin page? -- want to recheck step
+                headerPage = (FileHdrPage*) pagePtr;
+                hdrDirtyFlag = false; // false since it has not been updated
+                // read and pin the first page of the file into the buffer pool
+                if ((status = bufMgr->readPage(filePtr, headerPage->firstPage, curPage)) == OK)
+                {
+                    // initialization
+                    curPageNo = headerPage->firstPage;
+                    curDirtyFlag = false;
+                    curRec = NULLRID;
+                    // return
+                    returnStatus = status;
+                    return;
+                }
+                else
+                {
+                    returnStatus = status;
+                    return;
+                }
+            }
+            else 
+            {
+                returnStatus = status;
+                return;
+            }
+        }
+        else 
+        {
+            returnStatus = status;
+            return;
+        }
     }
     else
     {
