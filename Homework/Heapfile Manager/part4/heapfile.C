@@ -74,11 +74,9 @@ const Status destroyHeapFile(const string fileName)
 // constructor opens the underlying file
 
 /**
- * This method first opens the appropriate file by calling db.openFile() (do not forget to save the File* returned in the filePtr data member). 
- * Next, it reads and pins the header page for the file in the buffer pool, initializing the private data members headerPage, headerPageNo, and hdrDirtyFlag.
- * You might be wondering how you get the page number of the header page. This is what file->getFirstPage() is used for (see description of the I/O layer)! 
- * Finally, read and pin the first page of the file into the buffer pool, initializing the values of curPage, curPageNo, and curDirtyFlag appropriately.
- * Set curRec to NULLRID.
+ * This method first opens the appropriate file by calling db.openFile() Next, it reads and pins the header page for the file in the buffer pool, 
+ * initializing the private data members headerPage, headerPageNo, and hdrDirtyFlag. Finally, it reads and pins the first page of the file into the buffer pool,
+ * initializing the values of curPage, curPageNo, and curDirtyFlag appropriately and sets curRec to NULLRID
  */
 HeapFile::HeapFile(const string & fileName, Status& returnStatus)
 {
@@ -222,15 +220,6 @@ HeapFileScan::HeapFileScan(const string & name,
 			   Status & status) : HeapFile(name, status)
 {
     filter = NULL;
-    // added initialization of data members -- MAY BE UNNEEDED SO I WILL COMMENT OUT
-    // offset = 0;
-    // length = 0;
-    // // not sure about the initialization of enums
-    // op = EQ; // default comparison is now equal
-    // type = STRING; // default data type is a string
-
-    // markedPageNo = -1;
-    // markedRec = NULLRID;
 }
 
 const Status HeapFileScan::startScan(const int offset_,
@@ -314,12 +303,9 @@ const Status HeapFileScan::resetScan()
 }
 
 /**
- * Returns (via the outRid parameter) the RID of the next record that satisfies the scan predicate. The basic idea is to scan the file one page at a time. 
- * For each page, use the firstRecord() and nextRecord() methods of the Page class to get the rids of all the records on the page. Convert the rid to a 
- * pointer to the record data and invoke matchRec() to determine if record satisfies the filter associated with the scan. If so, store the rid in curRec
- * and return curRec. To make things fast, keep the current page pinned until all the records on the page have been processed. Then continue with the next
- * page in the file.  Since the HeapFileScan class is derived from the HeapFile class it also has all the methods of the HeapFile class as well. Returns OK 
- * if no errors occurred. Otherwise, return the error code of the first error that occurred.
+ * For each page, this method uses the firstRecord() and nextRecord() methods of the Page class to get the rids of all the records on the page. Then it converts the rid to a 
+ * pointer to the record data and invoke matchRec() to determine if record satisfies the filter associated with the scan. If so, it stores the rid in curRec
+ * @return the RID of the next record that satisfies the scan predicate, OK if no errors occurred. Otherwise, return the error code of the first error that occurred.
  */
 const Status HeapFileScan::scanNext(RID& outRid)
 {
