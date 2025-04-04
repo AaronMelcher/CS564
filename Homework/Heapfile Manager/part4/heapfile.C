@@ -220,6 +220,15 @@ HeapFileScan::HeapFileScan(const string & name,
 			   Status & status) : HeapFile(name, status)
 {
     filter = NULL;
+    // added initialization of data members
+    offset = 0;
+    length = 0;
+    // not sure about the initialization of enums
+    op = EQ; // default comparison is now equal
+    type = STRING; // default data type is a string
+
+    markedPageNo = -1;
+    markedRec = NULLRID;
 }
 
 const Status HeapFileScan::startScan(const int offset_,
