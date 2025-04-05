@@ -484,15 +484,22 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
     Status	status, unpinstatus;
     RID		rid;
 
-    // checks if curpage is null, if so, changes the curpage to the last page
-    if (curPage == NULL) {
+    // checks if curpage is null or the last page, if so, changes the curpage to the last page
+    if (curPage == NULL || curPageNo != headerPage->lastPage) {
+        // unpin if curpageNo is not the last page
+        if (curPageNo != NULL) {
+            unpinstatus = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
+            if (unpinstatus != OK) {
+                return unpinstatus;
+            }
+            curDirtyFlag = false;
+        }
         curPageNo = headerPage->lastPage;
         status = bufMgr->readPage(filePtr, curPageNo, curPage);
         if (status != OK) {
             return status;
         }
     }
-
     // attempt to insert record
     status = curPage->insertRecord(rec, outRid);
     // if able to insert a record
@@ -504,7 +511,6 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
         return status;
         // If unable to insert a record
     } else {
-        //
         status = bufMgr->allocPage(filePtr, newPageNo, newPage);
         if (status != OK) {
             return status;
@@ -533,6 +539,7 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
         if (status != OK) {
             return status;
         }
+        // on success, update properties
         hdrDirtyFlag = true;
         curDirtyFlag = true;
         headerPage->recCnt++;
