@@ -334,7 +334,6 @@ const Status HeapFileScan::scanNext(RID& outRid)
         } else {
             status = curPage->firstRecord(nextRid);
         }
-        status = curPage->firstRecord(nextRid);
         if (status != OK) {
             return status;
         }
