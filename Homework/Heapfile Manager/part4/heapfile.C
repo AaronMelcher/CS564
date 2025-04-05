@@ -329,38 +329,52 @@ const Status HeapFileScan::scanNext(RID& outRid)
     }
     // go into an infinite loop to find next record to satisfy scan predicate
     while (true) {
+        // cerr << "error in start of first while loop\n";
         // scan first record
-        status = curPage->firstRecord(nextRid);
-        if (status != OK) {
-            return status;
+        if (curRec.pageNo == curPageNo) {
+            cerr << "equal rec pageNo and curPageNo " << status;
+            status = curPage->nextRecord(curRec, nextRid);
+            if (status != OK) {
+                cerr << "error in NEXTRecord " << status;
+                return status;
+            }
+        } else {
+            status = curPage->firstRecord(nextRid);
+            if (status != OK) {
+                cerr << "error in firstRecord\n";
+                return status;
+            }
         }
         // create another loop for all records within the page
         while (status == OK) {
+            // cerr << "error in start of second while loop\n";
             tmpRid = nextRid;
             // grabs record
             status = curPage->getRecord(tmpRid, rec);
             if (status != OK) {
+                cerr << "error in firstRecord\n";
                 return status;
             }
             // HIT CASE --> Do I also have to save curRec
             if (matchRec(rec)) {
+                cerr << "error inside of matchRec???\n";
                 outRid = tmpRid;
                 curRec = tmpRid;
                 return OK;
             }
             status = curPage->nextRecord(tmpRid, nextRid);
         }
-        // unpin the current page, then move to the next
+        cerr << "Does it ever hit this case\n";
+        // unpin the current page, move to the next
+        status = curPage->getNextPage(nextPageNo);
+        if (status != OK) {
+            return status;
+        }
         status = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
         if (status != OK) {
             return status;
         }
         curDirtyFlag = false; // can now be set to false after unpinning
-        // check next page
-        status = curPage->getNextPage(nextPageNo);
-        if (status != OK) {
-            return status;
-        }
         curPageNo = nextPageNo; // updates current page Number
         status = bufMgr->readPage(filePtr, curPageNo, curPage);
         if (status != OK) {
@@ -368,6 +382,8 @@ const Status HeapFileScan::scanNext(RID& outRid)
         }
     }
     return BUFFEREXCEEDED; // should never hit this case
+
+
 }
 
 
