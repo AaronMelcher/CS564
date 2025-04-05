@@ -329,25 +329,15 @@ const Status HeapFileScan::scanNext(RID& outRid)
     }
     // go into an infinite loop to find next record to satisfy scan predicate
     while (true) {
-        // cerr << "error in start of first while loop\n";
-        // scan first record
-        if (curRec.pageNo == curPageNo) {
-            cerr << "equal rec pageNo and curPageNo " << status;
-            status = curPage->nextRecord(curRec, nextRid);
-            if (status != OK) {
-                cerr << "error in NEXTRecord " << status;
-                return status;
-            }
-        } else {
-            status = curPage->firstRecord(nextRid);
-            if (status != OK) {
-                cerr << "error in firstRecord\n";
-                return status;
-            }
+        cerr << "error in start of first while loop\n";
+        status = curPage->firstRecord(nextRid);
+        if (status != OK) {
+            cerr << "error in firstRecord\n";
+            return status;
         }
         // create another loop for all records within the page
         while (status == OK) {
-            // cerr << "error in start of second while loop\n";
+            cerr << "error in start of second while loop\n";
             tmpRid = nextRid;
             // grabs record
             status = curPage->getRecord(tmpRid, rec);
@@ -355,9 +345,8 @@ const Status HeapFileScan::scanNext(RID& outRid)
                 cerr << "error in firstRecord\n";
                 return status;
             }
-            // HIT CASE --> Do I also have to save curRec
             if (matchRec(rec)) {
-                cerr << "error inside of matchRec???\n";
+                cerr << "Hits inside of matchRec";
                 outRid = tmpRid;
                 curRec = tmpRid;
                 return OK;
