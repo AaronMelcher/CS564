@@ -501,10 +501,11 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
         }
     }
     // attempt to insert record
-    status = curPage->insertRecord(rec, outRid);
+    status = curPage->insertRecord(rec, rid);
     // if able to insert a record
     if (status == OK) {
         // Book keeping
+        outRid = rid;
         hdrDirtyFlag = true;
         curDirtyFlag = true;
         headerPage->recCnt++;
@@ -535,11 +536,12 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
         curPage = newPage;
         curPageNo = newPageNo;
         // Retry inserting a record
-        status = curPage->insertRecord(rec, outRid);
+        status = curPage->insertRecord(rec, rid);
         if (status != OK) {
             return status;
         }
         // on success, update properties
+        outRid = rid;
         hdrDirtyFlag = true;
         curDirtyFlag = true;
         headerPage->recCnt++;
