@@ -1,3 +1,12 @@
+/**
+ * Team Members:
+ *  Aaron Melcher 9083077132
+ *  Krishaan Bhagat 9083130147
+ *  Collin Krmpotich 9083059254
+ * Purpose:
+ *  SOMEONE PLEEEEEASSSE FILL THIS OUT
+ */
+
 #include "heapfile.h"
 #include "error.h"
 
@@ -559,63 +568,6 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
         headerPage->recCnt++;
         return status;
     }
-
-
-
-    // // Ensure current page is the last page
-    // // If curPage is NULL or not the last page,
-    // // unpin the page and load in the last page
-    // if(curPage == NULL || curPageNo != headerPage->lastPage){
-    //     if(curPage != NULL) {
-    //         unpinstatus = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
-    //         if(status != OK)
-    //             return status;
-    //     }
-    //     int lastPageNo = headerPage->lastPage;
-    //     status = bufMgr->readPage(filePtr, lastPageNo, curPage);
-    //     if(status != OK);
-    //         return status;
-    //     curPageNo = lastPageNo;
-    //     curDirtyFlag = false;
-    // }
-
-    // // Attempt to insert the record into the last page
-    // status = curPage->insertRecord(rec, outRid);
-
-    // // Alloc new page if insufficient space
-    // if(status == NOSPACE){
-    //     status = bufMgr->allocPage(filePtr, newPageNo, newPage);
-    //     if(status != OK)
-    //         return status;
-        
-    //     // Init new page
-    //     newPage->init(newPageNo);
-    //     headerPage->lastPage = newPageNo;
-    //     headerPage->pageCnt++;
-    //     hdrDirtyFlag = true;
-
-    //     // Unpin current page
-    //     unpinstatus = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
-    //     if(status != OK)
-    //         return status;
-        
-    //     // Set new page as current
-    //     curPage = newPage;
-    //     curPageNo = newPageNo;
-    //     curDirtyFlag = false;
-
-    //     // Attempt again to insert the record
-    //     status = curPage->insertRecord(rec, outRid);
-    //     if(status != OK)
-    //         return status;
-    // } else if (status != OK){
-    //     return status; // return any non-NOSPACE errors
-    // }
-
-    // headerPage->recCnt++;
-    // hdrDirtyFlag = true;
-
-    // return OK;
 }
 
 
