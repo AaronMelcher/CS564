@@ -329,13 +329,11 @@ const Status HeapFileScan::scanNext(RID& outRid)
     }
     // go into an infinite loop to find next record to satisfy scan predicate
     while (true) {
+        // grabs the current the last record
         if (curRec.pageNo == curPageNo) {
             status = curPage->nextRecord(curRec, nextRid);
         } else {
             status = curPage->firstRecord(nextRid);
-        }
-        if (status != OK) {
-            return status;
         }
         // create another loop for all records within the page
         while (status == OK) {
@@ -356,6 +354,10 @@ const Status HeapFileScan::scanNext(RID& outRid)
         status = curPage->getNextPage(nextPageNo);
         if (status != OK) {
             return status;
+        }
+        // LAST RECORD ISSUE
+        if (nextPageNo == -1) {
+            return FILEEOF;
         }
         status = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
         if (status != OK) {
