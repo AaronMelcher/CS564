@@ -215,7 +215,7 @@ const Status HeapFile::getRecord(const RID & rid, Record & rec)
     curRec = rid;
     curPageNo = rid.pageNo;
     curDirtyFlag = false;
-    
+
 	return status;
 	
 }
@@ -522,7 +522,10 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
         headerPage->lastPage = newPageNo;
         hdrDirtyFlag = true;
         // LINK PAGE ??? HOPE IT WORKS
-        curPage->setNextPage(newPageNo);
+        status = curPage->setNextPage(newPageNo);
+        if (status != OK) {
+            return status;
+        }
         // make current page to be the newly allocated page
         unpinstatus = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
         if (unpinstatus != OK) {
@@ -541,6 +544,9 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
         headerPage->recCnt++;
         return status;
     }
+
+
+
     // // Ensure current page is the last page
     // // If curPage is NULL or not the last page,
     // // unpin the page and load in the last page
