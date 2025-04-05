@@ -487,7 +487,7 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
     // checks if curpage is null or the last page, if so, changes the curpage to the last page
     if (curPage == NULL || curPageNo != headerPage->lastPage) {
         // unpin if curpageNo is not the last page
-        if (curPageNo != NULL) {
+        if (curPage != NULL) {
             unpinstatus = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
             if (unpinstatus != OK) {
                 return unpinstatus;
