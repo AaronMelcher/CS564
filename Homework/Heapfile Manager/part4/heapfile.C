@@ -62,7 +62,7 @@ const Status createHeapFile(const string fileName)
 
         return OK;
     }
-    return (FILEEXISTS);
+    return FILEEXISTS;
 }
 
 // routine to destroy a heapfile
@@ -504,7 +504,8 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
         return status;
         // If unable to insert a record
     } else {
-        status = bufMgr->readPage(filePtr, newPageNo, newPage);
+        //
+        status = bufMgr->allocPage(filePtr, newPageNo, newPage);
         if (status != OK) {
             return status;
         }
