@@ -484,13 +484,6 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
     Status	status, unpinstatus;
     RID		rid;
 
-    // check for very large records
-    if ((unsigned int) rec.length > PAGESIZE-DPFIXED)
-    {
-        // will never fit on a page, so don't even bother looking
-        return INVALIDRECLEN;
-    }
-
     // checks if curpage is null, if so, changes the curpage to the last page
     if (curPage == NULL) {
         curPageNo = headerPage->lastPage;
