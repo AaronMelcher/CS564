@@ -59,6 +59,11 @@ const Status createHeapFile(const string fileName)
         // Keeping in for now, may not need
         bufMgr->unPinPage(file, hdrPageNo, true);
         bufMgr->unPinPage(file, newPageNo, true);
+        
+        status = db.closeFile(file);
+        if (status != OK) {
+            return status;
+        }
 
         return OK;
     }
