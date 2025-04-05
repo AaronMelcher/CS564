@@ -329,31 +329,30 @@ const Status HeapFileScan::scanNext(RID& outRid)
     }
     // go into an infinite loop to find next record to satisfy scan predicate
     while (true) {
-        cerr << "error in start of first while loop\n";
+        if (curRec.pageNo == curPageNo) {
+            status = curPage->nextRecord(curRec, nextRid);
+        } else {
+            status = curPage->firstRecord(nextRid);
+        }
         status = curPage->firstRecord(nextRid);
         if (status != OK) {
-            cerr << "error in firstRecord\n";
             return status;
         }
         // create another loop for all records within the page
         while (status == OK) {
-            cerr << "error in start of second while loop\n";
             tmpRid = nextRid;
             // grabs record
             status = curPage->getRecord(tmpRid, rec);
             if (status != OK) {
-                cerr << "error in firstRecord\n";
                 return status;
             }
             if (matchRec(rec)) {
-                cerr << "Hits inside of matchRec";
                 outRid = tmpRid;
                 curRec = tmpRid;
                 return OK;
             }
             status = curPage->nextRecord(tmpRid, nextRid);
         }
-        cerr << "Does it ever hit this case\n";
         // unpin the current page, move to the next
         status = curPage->getNextPage(nextPageNo);
         if (status != OK) {
@@ -371,8 +370,6 @@ const Status HeapFileScan::scanNext(RID& outRid)
         }
     }
     return BUFFEREXCEEDED; // should never hit this case
-
-
 }
 
 
