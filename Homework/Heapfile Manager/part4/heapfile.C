@@ -1,3 +1,12 @@
+/**
+ * Team Members:
+ *  Aaron Melcher 9083077132
+ *  Krishaan Bhagat 9083130147
+ *  Collin Krmpotich 9083059254
+ * Purpose:
+ *  SOMEONE PLEEEEEASSSE FILL THIS OUT
+ */
+
 #include "heapfile.h"
 #include "error.h"
 
