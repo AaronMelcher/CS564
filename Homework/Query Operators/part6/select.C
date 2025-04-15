@@ -128,7 +128,7 @@ const Status ScanSelect(const string & result,
 	while((status = scan.scanNext(rid)) == OK){
 		status = scan.getRecord(rec);
 		if(status!=OK)
-			break; // return or break?
+			return status; // return or break?
 
 		// Allocate buffer for tuple
 		int projRecLen = 0;
@@ -155,7 +155,7 @@ const Status ScanSelect(const string & result,
 		status = insert.insertRecord(projRec, newRID);
 		if(status != OK) {
 			delete [] projTuple;
-			break; // break or return? -> missing error code if break?
+			return status; // break or return? -> missing error code if break?
 		}
 
 		// Free buffer
