@@ -129,8 +129,6 @@ const Status ScanSelect(const string & result,
 	}
 	
 	// Go through and perform projection for matching records
-	cout << "Retrieving records that match input params..." << endl;
-
 	RID rid;
 	Record rec;
 	while((status = scan.scanNext(rid)) == OK){
@@ -157,7 +155,7 @@ const Status ScanSelect(const string & result,
 
 		// create new Record for the tuple
 		Record projRec;
-		projRec.data = projTuple;
+		projRec.data = (void*)projTuple;
 		projRec.length = projRecLen;
 
 		// Insert into the result relation
