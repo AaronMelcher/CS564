@@ -98,5 +98,71 @@ const Status ScanSelect(const string & result,
 {
     cout << "Doing HeapFileScan Selection using ScanSelect()" << endl;
 
+	string relname = projNames[0].relName;
+	Status status;
 
+	// Create HeapFileScan for input relation
+	HeapFileScan scan(relname, status);
+	if(status!=OK)
+		return status;
+
+	// Start scanning. Include values if selection pred provided
+	if(attrDesc != NULL){
+		status = scan.startScan(attrDesc->attrOffset, attrDesc->attrLen,
+								(Datatype)attrDesc->attrType, filter, op);
+	} else {
+		// Unconditional scan (no predicate)
+		status = scan.startScan(0, 0, STRING, NULL, op);
+	}
+	if(status!=OK)
+		return status;
+
+	// Open result relation
+	InsertFileScan insert(result, status);
+	if(status!=OK)
+		return status;
+	
+	// Go through and perform projection for matching records
+	RID rid;
+	Record rec;
+	while((status = scan.scanNext(rid)) == OK){
+		status = scan.getRecord(rec);
+		if(status!=OK)
+			break; // return or break?
+
+		// Allocate buffer for tuple
+		int projRecLen = 0;
+		for(int i = 0; i < projCnt; i++){
+			projRecLen += projNames[i].attrLen;
+		}
+		char* projTuple = new char[projRecLen];
+		int destOffset = 0;
+
+		// For each attribute, copy corresponding bytes from the record
+		// Get items from the catalog
+		for(int i = 0; i < projCnt; i++){
+			memcpy(projTuple + destOffset, rec.data + projNames[i].attrOffset, projNames[i].attrLen);
+			destOffset += projNames[i].attrLen;
+		}
+
+		// create new Record for the tuple
+		Record projRec;
+		projRec.data = projTuple;
+		projRec.length = projRecLen;
+
+		// Insert into the result relation
+		RID newRID;
+		status = insert.insertRecord(projRec, newRID);
+		if(status != OK) {
+			delete [] projTuple;
+			break; // break or return? -> missing error code if break?
+		}
+
+		// Free buffer
+		delete [] projTuple;
+	}
+
+	// End scan
+	status = scan.endScan();
+	return status;
 }
