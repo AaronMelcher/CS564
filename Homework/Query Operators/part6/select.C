@@ -1,6 +1,7 @@
 #include "catalog.h"
 #include "query.h"
-
+#include "stdio.h"
+#include "stdlib.h"
 
 // forward declaration
 const Status ScanSelect(const string & result, 
@@ -28,7 +29,60 @@ const Status QU_Select(const string & result,
 {
    // Qu_Select sets up things and then calls ScanSelect to do the actual work
     cout << "Doing QU_Select " << endl;
+	
+	// need check for no projections? -> default to ALL in this case?
 
+	string relname = projNames[0].relName;
+
+	// Get schema for the above relation via the attribute catalog
+	int fullAttrCnt = 0;
+	AttrDesc *fullAttrs = nullptr;
+	Status status = attrCat->getRelInfo(relname, fullAttrCnt, fullAttrs);
+	
+	if(status!=OK)
+		return status;
+
+	// Compute record length
+	int recordLen = 0;
+	for(int i = 0; i < fullAttrCnt; i++){
+		recordLen += fullAttrs[i].attrLen;
+	}
+
+	// Build array of AttrDesc objects
+	AttrDesc *projDescs = new AttrDesc[projCnt];
+	for(int i = 0; i < projCnt; i++) {
+		bool found=false;
+		for(int j = 0; j < fullAttrCnt; j++){
+			if (string(projNames[i].attrName) == string(fullAttrs[j].attrName)) {
+				projDescs[i] = fullAttrs[j];
+				found=true;
+				break;
+			}
+		}
+		if(!found){
+			cout << "Error: Projection attribute " << projNames[i].attrName 
+        	<< " not found in relation " << relname << endl;
+			delete [] projDescs;
+			delete [] fullAttrs;
+			return ATTRNOTFOUND;
+		}
+	}
+
+	// Retrieve selection predicate descriptor if applicable
+	AttrDesc predAttrDesc;
+	AttrDesc *predAttrDescPtr = NULL;
+	if(attr != NULL) {
+		status = attrCat->getInfo(relname, string(attr->attrName), predAttrDesc);
+		if(status != OK){
+			delete [] projDescs;
+			delete [] fullAttrs;
+			return status;
+		}
+		predAttrDescPtr = &predAttrDesc;
+	}
+
+	// Call ScanSelect to perform the selction and projection
+	status = ScanSelect(result, projCnt, projDescs, predAttrDescPtr, op, attrValue, recordLen);
 }
 
 
