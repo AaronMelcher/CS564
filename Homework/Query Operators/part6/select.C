@@ -129,6 +129,7 @@ const Status ScanSelect(const string & result,
 	}
 	
 	// Go through and perform projection for matching records
+	cout << "Starting projection for matching records..." << endl;
 	RID rid;
 	Record rec;
 	while((status = scan.scanNext(rid)) == OK){
@@ -138,6 +139,7 @@ const Status ScanSelect(const string & result,
 			return status;
 		}
 
+		cout << "Buffer allocation for current tuple..." << endl;
 		// Allocate buffer for tuple
 		int projRecLen = 0;
 		for(int i = 0; i < projCnt; i++){
@@ -153,12 +155,14 @@ const Status ScanSelect(const string & result,
 			destOffset += projNames[i].attrLen;
 		}
 
+		cout << "Creating new record..." << endl;
 		// create new Record for the tuple
 		Record projRec;
 		projRec.data = (void*)projTuple;
 		projRec.length = projRecLen;
 
 		// Insert into the result relation
+		cout << "Inserting new record..." << endl;
 		RID newRID;
 		status = insert.insertRecord(projRec, newRID);
 		if(status != OK) {
