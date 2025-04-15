@@ -103,8 +103,10 @@ const Status ScanSelect(const string & result,
 
 	// Create HeapFileScan for input relation
 	HeapFileScan scan(relname, status);
-	if(status!=OK)
+	if(status!=OK) {
+		cout << "Error: unable to create HeapFileScan object" << endl;
 		return status;
+	}
 
 	// Start scanning. Include values if selection pred provided
 	if(attrDesc != NULL){
@@ -114,21 +116,27 @@ const Status ScanSelect(const string & result,
 		// Unconditional scan (no predicate)
 		status = scan.startScan(0, 0, STRING, NULL, op);
 	}
-	if(status!=OK)
+	if(status!=OK) {
+		cout << "Error: unable to start scan" << endl;
 		return status;
+	}
 
 	// Open result relation
 	InsertFileScan insert(result, status);
-	if(status!=OK)
+	if(status!=OK) {
+		cout << "Error: unable to open result relation (InserFileScan object)" << endl;
 		return status;
+	}
 	
 	// Go through and perform projection for matching records
 	RID rid;
 	Record rec;
 	while((status = scan.scanNext(rid)) == OK){
 		status = scan.getRecord(rec);
-		if(status!=OK)
-			return status; // return or break?
+		if(status!=OK) {
+			cout << "Error: unable to retrieve record " << endl;
+			return status;
+		}
 
 		// Allocate buffer for tuple
 		int projRecLen = 0;
@@ -154,6 +162,7 @@ const Status ScanSelect(const string & result,
 		RID newRID;
 		status = insert.insertRecord(projRec, newRID);
 		if(status != OK) {
+			cout << "Error: unable to insert record to result relation" << endl;
 			delete [] projTuple;
 			return status; // break or return? -> missing error code if break?
 		}
