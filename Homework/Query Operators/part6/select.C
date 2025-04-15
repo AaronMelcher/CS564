@@ -83,6 +83,8 @@ const Status QU_Select(const string & result,
 
 	// Call ScanSelect to perform the selction and projection
 	status = ScanSelect(result, projCnt, projDescs, predAttrDescPtr, op, attrValue, recordLen);
+	delete [] projDescs;
+	return status;
 }
 
 
