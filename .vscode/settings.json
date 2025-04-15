@@ -4,6 +4,8 @@
         "bufHash.C": "cpp",
         "db.C": "cpp",
         "testbuf.C": "cpp",
-        "error.C": "cpp"
+        "error.C": "cpp",
+        "testfile.C": "cpp",
+        "heapfile.C": "cpp"
     }
 }
