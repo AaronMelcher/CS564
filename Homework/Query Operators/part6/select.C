@@ -129,6 +129,8 @@ const Status ScanSelect(const string & result,
 	}
 	
 	// Go through and perform projection for matching records
+	cout << "Retrieving records that match input params..." << endl;
+
 	RID rid;
 	Record rec;
 	while((status = scan.scanNext(rid)) == OK){
