@@ -4,7 +4,7 @@
  *  Krishaan Bhagat 9083130147
  *  Collin Krmpotich 9083059254
  * Purpose:
- *  SOMEONE PLEEEEEASSSE FILL THIS OUT
+ *  This file acts as a heapfile manager
  */
 
 #include "heapfile.h"
