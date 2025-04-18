@@ -82,9 +82,25 @@ const Status QU_Select(const string & result,
 	}
 
 	// Call ScanSelect to perform the selction and projection
-	status = ScanSelect(result, projCnt, projDescs, predAttrDescPtr, op, attrValue, recordLen);
-	delete [] projDescs;
-	return status;
+	// converting to appropriate type
+	if (predAttrDesc.attrType == INTEGER) {
+        // make integer
+        int intVal = std::atoi(attrValue);
+        status = ScanSelect(result, projCnt, projDescs, predAttrDescPtr, op, (char*)&intVal, recordLen);
+        delete [] projDescs;
+	    return status;
+    } else if (predAttrDesc.attrType == FLOAT) {
+        // make float
+        float fltVal = std::atof(attrValue);
+		status = status = ScanSelect(result, projCnt, projDescs, predAttrDescPtr, op, (char*)&fltVal, recordLen);
+        delete [] projDescs;
+	    return status;
+    } else {
+		status = ScanSelect(result, projCnt, projDescs, predAttrDescPtr, op, attrValue, recordLen);
+        delete [] projDescs;
+		return status;
+    }
+
 }
 
 
