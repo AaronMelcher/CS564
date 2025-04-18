@@ -1,6 +1,6 @@
 #include "catalog.h"
 #include "query.h"
-
+#include <cstdlib>
 
 /*
  * Deletes records from a specified relation.
@@ -17,19 +17,12 @@ const Status QU_Delete(const string & relation,
 		       const char *attrValue)
 {
 
-	// part 6
-
-	// passed relation, attrName, operator, type, pointer to attribute value
-
-	cout << "Doing QU_Delete on relation " << relation << "attrName: " << attrName << " OP: " << op << "type: " <<type << " attrValue: " << attrValue << endl;
+	cout << "Relation: " << relation << " attrName: " << attrName << " op: " << op << " type: " << type << " attrValue: " << attrValue << endl;
 	Status status;
-
-	// This function will delete all tuples in relation satisfying the predicate specified by attrName, op, and the constant attrValue. 
-	// type denotes the type of the attribute. You can locate all the qualifying tuples using a filtered HeapFileScan.
 
 	HeapFileScan scan(relation, status);
 
-	if (attrName == "") {
+	if (attrName == "" || relation == "") {
 		status = scan.startScan(0, 0, type, nullptr, op);
 	} else {
 		AttrDesc attr;
@@ -38,27 +31,40 @@ const Status QU_Delete(const string & relation,
 			return status;
 		}
 
-		cout << "attr.attrType: " << attr.attrType << "\n";
+		if (type == INTEGER) {
+			// make integer
+			int intVal = std::atoi(attrValue);
+			status = scan.startScan(attr.attrOffset, attr.attrLen, type, (char*)&intVal, op);
+            if (status != OK) {
+               return status;
+            }
+		} else if (type == FLOAT) {
+			// make float
+			float fltVal = std::atof(attrValue);
+			status = scan.startScan(attr.attrOffset, attr.attrLen, type, (char*)&fltVal, op);
+            if (status != OK) {
+               return status;
+            }
+		} else {
+			status = scan.startScan(attr.attrOffset, attr.attrLen, type, attrValue, op);
+	        if (status != OK) {
+	           return status;
+	        }
+		}
+	}
 
-		status = scan.startScan(attr.attrOffset, attr.attrLen, type, attrValue, op);
+	RID rid;
+	// Loop to find matches and delete them
+    while ((status = scan.scanNext(rid)) == OK) {
+		status = scan.deleteRecord();
 		if (status != OK) {
+			scan.endScan();
 			return status;
 		}
 	}
 
-	// Loop over matches and delete them
-    RID rid;
-    while ((status = scan.scanNext(rid)) == OK) {
-        status = scan.deleteRecord();
-        if (status != OK) {
-            scan.endScan();
-            return status;
-        }
-    }
-
     // End scan
     scan.endScan();
-
 	return OK;
 
 }
