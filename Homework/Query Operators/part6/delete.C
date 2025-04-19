@@ -17,7 +17,7 @@ const Status QU_Delete(const string & relation,
 		       const char *attrValue)
 {
 
-	cout << "Relation: " << relation << " attrName: " << attrName << " op: " << op << " type: " << type << " attrValue: " << attrValue << endl;
+	//cout << "Relation: " << relation << " attrName: " << attrName << " op: " << op << " type: " << type << " attrValue: " << attrValue << endl;
 	Status status;
 
 	if (relation == "") {
