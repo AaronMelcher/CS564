@@ -28,7 +28,7 @@ const Status QU_Select(const string & result,
 		       const char *attrValue)
 {
    // Qu_Select sets up things and then calls ScanSelect to do the actual work
-    cout << "Doing QU_Select " << endl;
+    //cout << "Doing QU_Select " << endl;
 	
 	// need check for no projections? -> default to ALL in this case?
 
@@ -114,7 +114,7 @@ const Status ScanSelect(const string & result,
 			const char *filter,
 			const int reclen)
 {
-    cout << "Doing HeapFileScan Selection using ScanSelect()" << endl;
+    //cout << "Doing HeapFileScan Selection using ScanSelect()" << endl;
 
 	string relname = projNames[0].relName;
 	Status status;

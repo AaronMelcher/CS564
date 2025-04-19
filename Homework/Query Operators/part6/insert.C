@@ -14,7 +14,7 @@ const Status QU_Insert(const string & relation,
 	const int attrCnt, 
 	const attrInfo attrList[])
 {
-	cout << "Doing QU_Insert on relation " << relation << endl;
+	//cout << "Doing QU_Insert on relation " << relation << endl;
 	Status status;
 
 	// Retrieve full schema for this relation
