@@ -92,7 +92,7 @@ const Status QU_Select(const string & result,
     } else if (predAttrDesc.attrType == FLOAT) {
         // make float
         float fltVal = std::atof(attrValue);
-		status = status = ScanSelect(result, projCnt, projDescs, predAttrDescPtr, op, (char*)&fltVal, recordLen);
+		status = ScanSelect(result, projCnt, projDescs, predAttrDescPtr, op, (char*)&fltVal, recordLen);
         delete [] projDescs;
 	    return status;
     } else {
