@@ -1,0 +1,944 @@
+running test # 1 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create soaps (soapid = int, name = char(28), network = char(4), rating = real);
+Creating relation soaps
+
+>>> load soaps("../data/soaps.data");
+Number of records inserted: 9
+
+>>> create stars (starid = int, real_name = char(20), plays = char(12), soapid = int);
+Creating relation stars
+
+>>> load stars("../data/stars.data");
+Number of records inserted: 29
+
+>>> select (soaps.soapid, soaps.name, soaps.network, soaps.rating);
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+soapid name                 network rating 
+------  --------------------  -------  ------  
+0       Days of Our Lives     NBC      7.02    
+1       General Hospital      ABC      9.81    
+2       Guiding Light         CBS      4.02    
+3       One Life to Live      ABC      2.31    
+4       Santa Barbara         NBC      6.44    
+5       The Young and the Re  CBS      5.50    
+6       As the World Turns    CBS      7.00    
+7       Another World         NBC      1.97    
+8       All My Children       ABC      8.82    
+
+Number of records: 9
+
+>>> print soaps;
+Relation name: soaps
+
+soapid name                 network rating 
+------  --------------------  -------  ------  
+0       Days of Our Lives     NBC      7.02    
+1       General Hospital      ABC      9.81    
+2       Guiding Light         CBS      4.02    
+3       One Life to Live      ABC      2.31    
+4       Santa Barbara         NBC      6.44    
+5       The Young and the Re  CBS      5.50    
+6       As the World Turns    CBS      7.00    
+7       Another World         NBC      1.97    
+8       All My Children       ABC      8.82    
+
+Number of records: 9
+
+>>> select (soaps.name, soaps.rating, soaps.network) where soaps.network = "NBC";
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+name                 rating network 
+--------------------  ------  -------  
+Days of Our Lives     7.02    NBC      
+Santa Barbara         6.44    NBC      
+Another World         1.97    NBC      
+
+Number of records: 3
+
+>>> select (stars.plays, stars.real_name, stars.starid) where stars.starid < 12;
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+plays        real_name            starid 
+------------  --------------------  ------  
+Kim           Hayes, Kathryn        0       
+Andy          DeFreitas, Scott      1       
+Julia         Grahn, Nancy          2       
+Esther        Linder, Kate          3       
+Katherine     Cooper, Jeanne        4       
+Harley        Ehlers, Beth          5       
+Keith         Novak, John           6       
+Renee         Elliot, Patricia      7       
+Gabrielle     Hutchinson, Fiona     8       
+Asa           Carey, Phil           9       
+Max           Walker, Nicholas      10      
+Eve           Ross, Charlotte       11      
+
+Number of records: 12
+
+>>> select (soaps.rating, soaps.network, soaps.name) where soaps.rating >= 5.000000;
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+rating network name                 
+------  -------  --------------------  
+7.02    NBC      Days of Our Lives     
+9.81    ABC      General Hospital      
+6.44    NBC      Santa Barbara         
+5.50    CBS      The Young and the Re  
+7.00    CBS      As the World Turns    
+8.82    ABC      All My Children       
+
+Number of records: 6
+
+>>> select (stars.real_name, stars.starid) where stars.starid > 567;
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+real_name            starid 
+--------------------  ------  
+
+Number of records: 0
+
+>>> select into ned (soaps.network, soaps.soapid, soaps.name) where soaps.network = "CBS";
+Creating relation ned
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+
+>>> print ned;
+Relation name: ned
+
+network soapid name                 
+-------  ------  --------------------  
+CBS      2       Guiding Light         
+CBS      5       The Young and the Re  
+CBS      6       As the World Turns    
+
+Number of records: 3
+
+>>> select into ned (soaps.network, soaps.soapid, soaps.name) where soaps.network = "NBC";
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+
+>>> print ned;
+Relation name: ned
+
+network soapid name                 
+-------  ------  --------------------  
+CBS      2       Guiding Light         
+CBS      5       The Young and the Re  
+CBS      6       As the World Turns    
+NBC      0       Days of Our Lives     
+NBC      4       Santa Barbara         
+NBC      7       Another World         
+
+Number of records: 6
+
+>>> create ted (plays = char(12), soapid = int);
+Creating relation ted
+
+>>> select into ted (stars.plays, stars.soapid) where stars.plays < "L";
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+
+>>> print ted;
+Relation name: ted
+
+plays        soapid 
+------------  ------  
+Kim           6       
+Andy          6       
+Julia         4       
+Esther        5       
+Katherine     5       
+Harley        2       
+Keith         4       
+Gabrielle     5       
+Asa           5       
+Eve           0       
+John          5       
+Fletcher      2       
+Jack          0       
+Keith         4       
+Denise        7       
+Brooke        8       
+Brian         8       
+Anna          1       
+Jenny         1       
+Kayla         0       
+
+Number of records: 20
+
+>>> Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 10 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create soaps (soapid = int, network = char(4));
+Creating relation soaps
+
+>>> create stars (starid = int, network = char(4));
+Creating relation stars
+
+>>> insert soaps (soapid = 5, network = "NBC");
+Doing QU_Insert on relation soaps
+
+>>> insert soaps (soapid = 5, network = "ABC");
+Doing QU_Insert on relation soaps
+
+>>> insert stars (starid = 5, network = "NBC");
+Doing QU_Insert on relation stars
+
+>>> insert stars (starid = 5, network = "ABC");
+Doing QU_Insert on relation stars
+
+>>> insert stars (starid = 5, network = "CNN");
+Doing QU_Insert on relation stars
+
+>>> select (soaps.soapid, soaps.network, stars.starid, stars.network) where soaps.soapid = stars.starid;
+Creating relation Tmp_Minirel_Result
+tuple nested join produced 6 result tuples 
+Relation name: Tmp_Minirel_Result
+
+soapid network starid network_0 
+------  -------  ------  ---------  
+-874053579           -874053579  žU         
+-874053579           -874053579  žU         
+-874053579           -874053579  žU         
+-874053579  žU       -874053579  žU         
+-874053579  žU       -874053579  žU         
+-874053579  žU       -874053579  žU         
+
+Number of records: 6
+
+>>> Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 11 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create R (unique1 = int);
+Creating relation R
+
+>>> load R("../data/unique1_1K_R.data");
+Number of records inserted: 1000
+
+>>> create S (unique1 = int);
+Creating relation S
+
+>>> load S("../data/unique1_1K_S.data");
+Number of records inserted: 1000
+
+>>> select (R.unique1, S.unique1) where R.unique1 = S.unique1;
+Creating relation Tmp_Minirel_Result
+Segmentation fault (core dumped)
+Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 12 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create R (unique1 = int);
+Creating relation R
+
+>>> Segmentation fault (core dumped)
+Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 2 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create soaps (soapid = int, name = char(28), network = char(4), rating = real);
+Creating relation soaps
+
+>>> load soaps("../data/soaps.data");
+Number of records inserted: 9
+
+>>> create stars (starid = int, real_name = char(20), plays = char(12), soapid = int);
+Creating relation stars
+
+>>> load stars("../data/stars.data");
+Number of records inserted: 29
+
+>>> select (stars.real_name, stars.plays) where stars.soapid = 0;
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+real_name            plays        
+--------------------  ------------  
+Ross, Charlotte       Eve           
+Ashford, Matthew      Jack          
+Evans, Mary Beth      Kayla         
+
+Number of records: 3
+
+>>> select (soaps.name, soaps.network) where soaps.network = "CBS";
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+name                 network 
+--------------------  -------  
+Guiding Light         CBS      
+The Young and the Re  CBS      
+As the World Turns    CBS      
+
+Number of records: 3
+
+>>> select (soaps.name, soaps.rating) where soaps.rating = 678.900024;
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+name                 rating 
+--------------------  ------  
+
+Number of records: 0
+
+>>> Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 3 ****************
+Database testdb created
+Segmentation fault (core dumped)
+Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 4 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create soaps (soapid = int, name = char(28), network = char(4), rating = real);
+Creating relation soaps
+
+>>> load soaps("../data/soaps.data");
+Number of records inserted: 9
+
+>>> create stars (starid = int, real_name = char(20), plays = char(12), soapid = int);
+Creating relation stars
+
+>>> load stars("../data/stars.data");
+Number of records inserted: 29
+
+>>> select (stars.plays, soaps.name, soaps.network) where stars.soapid = soaps.soapid;
+Creating relation Tmp_Minirel_Result
+tuple nested join produced 29 result tuples 
+Relation name: Tmp_Minirel_Result
+
+plays        name                 network 
+------------  --------------------  -------  
+Kim           As the World Turns    CBS      
+Andy          As the World Turns    CBS      
+Julia         Santa Barbara         NBC      
+Esther        The Young and the Re  CBS      
+Katherine     The Young and the Re  CBS      
+Harley        Guiding Light         CBS      
+Keith         Santa Barbara         NBC      
+Renee         One Life to Live      ABC      
+Gabrielle     The Young and the Re  CBS      
+Asa           The Young and the Re  CBS      
+Max           One Life to Live      ABC      
+Eve           Days of Our Lives     NBC      
+Stan          All My Children       ABC      
+John          The Young and the Re  CBS      
+Sharlene      Another World         NBC      
+Fletcher      Guiding Light         CBS      
+Lillian       Guiding Light         CBS      
+Lisa          One Life to Live      ABC      
+Megan         One Life to Live      ABC      
+Jack          Days of Our Lives     NBC      
+Keith         Santa Barbara         NBC      
+Opal          All My Children       ABC      
+Denise        Another World         NBC      
+Brooke        All My Children       ABC      
+Brian         All My Children       ABC      
+Anna          General Hospital      ABC      
+Robert        General Hospital      ABC      
+Jenny         General Hospital      ABC      
+Kayla         Days of Our Lives     NBC      
+
+Number of records: 29
+
+>>> select into temp1 (stars.real_name, stars.starid, stars.soapid) where stars.starid < 7;
+Creating relation temp1
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+
+>>> select into temp2 (temp1.real_name, temp1.starid, soaps.rating) where temp1.soapid = soaps.soapid;
+Creating relation temp2
+tuple nested join produced 7 result tuples 
+
+>>> select (temp2.real_name, temp2.starid, temp2.rating) where temp2.rating < 4.600000;
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+real_name            starid rating 
+--------------------  ------  ------  
+Ehlers, Beth          5       4.02    
+
+Number of records: 1
+
+>>> Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 5 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create soaps (soapid = int, name = char(28), network = char(4), rating = real);
+Creating relation soaps
+
+>>> load soaps("../data/soaps.data");
+Number of records inserted: 9
+
+>>> create stars (starid = int, real_name = char(20), plays = char(12), soapid = int);
+Creating relation stars
+
+>>> load stars("../data/stars.data");
+Number of records inserted: 29
+
+>>> print stars;
+Relation name: stars
+
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+0       Hayes, Kathryn        Kim           6       
+1       DeFreitas, Scott      Andy          6       
+2       Grahn, Nancy          Julia         4       
+3       Linder, Kate          Esther        5       
+4       Cooper, Jeanne        Katherine     5       
+5       Ehlers, Beth          Harley        2       
+6       Novak, John           Keith         4       
+7       Elliot, Patricia      Renee         3       
+8       Hutchinson, Fiona     Gabrielle     5       
+9       Carey, Phil           Asa           5       
+10      Walker, Nicholas      Max           3       
+11      Ross, Charlotte       Eve           0       
+12      Anthony, Eugene       Stan          8       
+13      Douglas, Jerry        John          5       
+14      Holbrook, Anna        Sharlene      7       
+15      Hammer, Jay           Fletcher      2       
+16      Sloan, Tina           Lillian       2       
+17      DuClos, Danielle      Lisa          3       
+18      Tuck, Jessica         Megan         3       
+19      Ashford, Matthew      Jack          0       
+20      Novak, John           Keith         4       
+21      Larson, Jill          Opal          8       
+22      McKinnon, Mary        Denise        7       
+23      Barr, Julia           Brooke        8       
+24      Borlenghi, Matt       Brian         8       
+25      Hughes, Finola        Anna          1       
+26      Rogers, Tristan       Robert        1       
+27      Richardson, Cheryl    Jenny         1       
+28      Evans, Mary Beth      Kayla         0       
+
+Number of records: 29
+
+>>> insert stars (starid = 100, real_name = "Posey, Parker", plays = "Tess", soapid = 6);
+Doing QU_Insert on relation stars
+
+>>> insert stars (real_name = "Bonarrigo, Laura", soapid = 3, starid = 101, plays = "Cassie");
+Doing QU_Insert on relation stars
+
+>>> print stars;
+Relation name: stars
+
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+0       Hayes, Kathryn        Kim           6       
+1       DeFreitas, Scott      Andy          6       
+2       Grahn, Nancy          Julia         4       
+3       Linder, Kate          Esther        5       
+4       Cooper, Jeanne        Katherine     5       
+5       Ehlers, Beth          Harley        2       
+6       Novak, John           Keith         4       
+7       Elliot, Patricia      Renee         3       
+8       Hutchinson, Fiona     Gabrielle     5       
+9       Carey, Phil           Asa           5       
+10      Walker, Nicholas      Max           3       
+11      Ross, Charlotte       Eve           0       
+12      Anthony, Eugene       Stan          8       
+13      Douglas, Jerry        John          5       
+14      Holbrook, Anna        Sharlene      7       
+15      Hammer, Jay           Fletcher      2       
+16      Sloan, Tina           Lillian       2       
+17      DuClos, Danielle      Lisa          3       
+18      Tuck, Jessica         Megan         3       
+19      Ashford, Matthew      Jack          0       
+20      Novak, John           Keith         4       
+21      Larson, Jill          Opal          8       
+22      McKinnon, Mary        Denise        7       
+23      Barr, Julia           Brooke        8       
+24      Borlenghi, Matt       Brian         8       
+25      Hughes, Finola        Anna          1       
+26      Rogers, Tristan       Robert        1       
+27      Richardson, Cheryl    Jenny         1       
+28      Evans, Mary Beth      Kayla         0       
+3158065  *V                    Kayla         5       
+3223601  *V                                  5       
+
+Number of records: 31
+
+>>> Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 6 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create soaps (soapid = int, name = char(28), network = char(4), rating = real);
+Creating relation soaps
+
+>>> load soaps("../data/soaps.data");
+Number of records inserted: 9
+
+>>> create stars (starid = int, real_name = char(20), plays = char(12), soapid = int);
+Creating relation stars
+
+>>> load stars("../data/stars.data");
+Number of records inserted: 29
+
+>>> print soaps;
+Relation name: soaps
+
+soapid name                 network rating 
+------  --------------------  -------  ------  
+0       Days of Our Lives     NBC      7.02    
+1       General Hospital      ABC      9.81    
+2       Guiding Light         CBS      4.02    
+3       One Life to Live      ABC      2.31    
+4       Santa Barbara         NBC      6.44    
+5       The Young and the Re  CBS      5.50    
+6       As the World Turns    CBS      7.00    
+7       Another World         NBC      1.97    
+8       All My Children       ABC      8.82    
+
+Number of records: 9
+
+>>> insert soaps (soapid = 100, name = "Dallas", network = "CBS", rating = 8.670000);
+Doing QU_Insert on relation soaps
+
+>>> insert soaps (network = "ABC", rating = 3.350000, name = "Loving", soapid = 101);
+Doing QU_Insert on relation soaps
+
+>>> print soaps;
+Relation name: soaps
+
+soapid name                 network rating 
+------  --------------------  -------  ------  
+0       Days of Our Lives     NBC      7.02    
+1       General Hospital      ABC      9.81    
+2       Guiding Light         CBS      4.02    
+3       One Life to Live      ABC      2.31    
+4       Santa Barbara         NBC      6.44    
+5       The Young and the Re  CBS      5.50    
+6       As the World Turns    CBS      7.00    
+7       Another World         NBC      1.97    
+8       All My Children       ABC      8.82    
+3158065  µU                             0.00    
+3223601  µU                             0.00    
+
+Number of records: 11
+
+>>> select (soaps.network, soaps.rating) where soaps.soapid = 101;
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+network rating 
+-------  ------  
+
+Number of records: 0
+
+>>> Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 7 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create soaps (soapid = int, name = char(28), network = char(4), rating = real);
+Creating relation soaps
+
+>>> load soaps("../data/soaps.data");
+Number of records inserted: 9
+
+>>> create stars (starid = int, real_name = char(20), plays = char(12), soapid = int);
+Creating relation stars
+
+>>> load stars("../data/stars.data");
+Number of records inserted: 29
+
+>>> print stars;
+Relation name: stars
+
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+0       Hayes, Kathryn        Kim           6       
+1       DeFreitas, Scott      Andy          6       
+2       Grahn, Nancy          Julia         4       
+3       Linder, Kate          Esther        5       
+4       Cooper, Jeanne        Katherine     5       
+5       Ehlers, Beth          Harley        2       
+6       Novak, John           Keith         4       
+7       Elliot, Patricia      Renee         3       
+8       Hutchinson, Fiona     Gabrielle     5       
+9       Carey, Phil           Asa           5       
+10      Walker, Nicholas      Max           3       
+11      Ross, Charlotte       Eve           0       
+12      Anthony, Eugene       Stan          8       
+13      Douglas, Jerry        John          5       
+14      Holbrook, Anna        Sharlene      7       
+15      Hammer, Jay           Fletcher      2       
+16      Sloan, Tina           Lillian       2       
+17      DuClos, Danielle      Lisa          3       
+18      Tuck, Jessica         Megan         3       
+19      Ashford, Matthew      Jack          0       
+20      Novak, John           Keith         4       
+21      Larson, Jill          Opal          8       
+22      McKinnon, Mary        Denise        7       
+23      Barr, Julia           Brooke        8       
+24      Borlenghi, Matt       Brian         8       
+25      Hughes, Finola        Anna          1       
+26      Rogers, Tristan       Robert        1       
+27      Richardson, Cheryl    Jenny         1       
+28      Evans, Mary Beth      Kayla         0       
+
+Number of records: 29
+
+>>> delete stars where stars.plays = "Lisa";
+Relation: stars attrName: plays op: 2 type: 0 attrValue: Lisa
+
+>>> delete stars where stars.real_name = "Anthony, Eugene";
+Relation: stars attrName: real_name op: 2 type: 0 attrValue: Anthony, Eugene
+
+>>> print stars;
+Relation name: stars
+
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+0       Hayes, Kathryn        Kim           6       
+1       DeFreitas, Scott      Andy          6       
+2       Grahn, Nancy          Julia         4       
+3       Linder, Kate          Esther        5       
+4       Cooper, Jeanne        Katherine     5       
+5       Ehlers, Beth          Harley        2       
+6       Novak, John           Keith         4       
+7       Elliot, Patricia      Renee         3       
+8       Hutchinson, Fiona     Gabrielle     5       
+9       Carey, Phil           Asa           5       
+10      Walker, Nicholas      Max           3       
+11      Ross, Charlotte       Eve           0       
+13      Douglas, Jerry        John          5       
+14      Holbrook, Anna        Sharlene      7       
+15      Hammer, Jay           Fletcher      2       
+16      Sloan, Tina           Lillian       2       
+18      Tuck, Jessica         Megan         3       
+19      Ashford, Matthew      Jack          0       
+20      Novak, John           Keith         4       
+21      Larson, Jill          Opal          8       
+22      McKinnon, Mary        Denise        7       
+23      Barr, Julia           Brooke        8       
+24      Borlenghi, Matt       Brian         8       
+25      Hughes, Finola        Anna          1       
+26      Rogers, Tristan       Robert        1       
+27      Richardson, Cheryl    Jenny         1       
+28      Evans, Mary Beth      Kayla         0       
+
+Number of records: 27
+
+>>> delete stars where stars.soapid = 1;
+Relation: stars attrName: soapid op: 2 type: 1 attrValue: 1
+
+>>> print stars;
+Relation name: stars
+
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+0       Hayes, Kathryn        Kim           6       
+1       DeFreitas, Scott      Andy          6       
+2       Grahn, Nancy          Julia         4       
+3       Linder, Kate          Esther        5       
+4       Cooper, Jeanne        Katherine     5       
+5       Ehlers, Beth          Harley        2       
+6       Novak, John           Keith         4       
+7       Elliot, Patricia      Renee         3       
+8       Hutchinson, Fiona     Gabrielle     5       
+9       Carey, Phil           Asa           5       
+10      Walker, Nicholas      Max           3       
+11      Ross, Charlotte       Eve           0       
+13      Douglas, Jerry        John          5       
+14      Holbrook, Anna        Sharlene      7       
+15      Hammer, Jay           Fletcher      2       
+16      Sloan, Tina           Lillian       2       
+18      Tuck, Jessica         Megan         3       
+19      Ashford, Matthew      Jack          0       
+20      Novak, John           Keith         4       
+21      Larson, Jill          Opal          8       
+22      McKinnon, Mary        Denise        7       
+23      Barr, Julia           Brooke        8       
+24      Borlenghi, Matt       Brian         8       
+26      Rogers, Tristan       Robert        1       
+27      Richardson, Cheryl    Jenny         1       
+28      Evans, Mary Beth      Kayla         0       
+
+Number of records: 26
+
+>>> delete stars;
+Relation: stars attrName:  op: 0 type: 0 attrValue: 
+>>> print stars;
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+
+>>> delete soaps where soaps.network < "NBC";
+
+>>> print soaps;
+soapid name                 network rating 
+------  --------------------  -------  ------  
+0       Days of Our Lives     NBC      7.02    
+4       Santa Barbara         NBC      6.44    
+7       Another World         NBC      1.97    
+
+>>> Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 8 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create soaps (soapid = int, name = char(28), network = char(4), rating = real);
+Creating relation soaps
+
+>>> load soaps("../data/soaps.data");
+Number of records inserted: 9
+
+>>> create stars (starid = int, real_name = char(20), plays = char(12), soapid = int);
+Creating relation stars
+
+>>> load stars("../data/stars.data");
+Number of records inserted: 29
+
+>>> print stars;
+Relation name: stars
+
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+0       Hayes, Kathryn        Kim           6       
+1       DeFreitas, Scott      Andy          6       
+2       Grahn, Nancy          Julia         4       
+3       Linder, Kate          Esther        5       
+4       Cooper, Jeanne        Katherine     5       
+5       Ehlers, Beth          Harley        2       
+6       Novak, John           Keith         4       
+7       Elliot, Patricia      Renee         3       
+8       Hutchinson, Fiona     Gabrielle     5       
+9       Carey, Phil           Asa           5       
+10      Walker, Nicholas      Max           3       
+11      Ross, Charlotte       Eve           0       
+12      Anthony, Eugene       Stan          8       
+13      Douglas, Jerry        John          5       
+14      Holbrook, Anna        Sharlene      7       
+15      Hammer, Jay           Fletcher      2       
+16      Sloan, Tina           Lillian       2       
+17      DuClos, Danielle      Lisa          3       
+18      Tuck, Jessica         Megan         3       
+19      Ashford, Matthew      Jack          0       
+20      Novak, John           Keith         4       
+21      Larson, Jill          Opal          8       
+22      McKinnon, Mary        Denise        7       
+23      Barr, Julia           Brooke        8       
+24      Borlenghi, Matt       Brian         8       
+25      Hughes, Finola        Anna          1       
+26      Rogers, Tristan       Robert        1       
+27      Richardson, Cheryl    Jenny         1       
+28      Evans, Mary Beth      Kayla         0       
+
+Number of records: 29
+
+>>> delete stars where stars.real_name = "Novak, John";
+Relation: stars attrName: real_name op: 2 type: 0 attrValue: Novak, John
+
+>>> print stars;
+Relation name: stars
+
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+0       Hayes, Kathryn        Kim           6       
+1       DeFreitas, Scott      Andy          6       
+2       Grahn, Nancy          Julia         4       
+3       Linder, Kate          Esther        5       
+4       Cooper, Jeanne        Katherine     5       
+5       Ehlers, Beth          Harley        2       
+7       Elliot, Patricia      Renee         3       
+8       Hutchinson, Fiona     Gabrielle     5       
+9       Carey, Phil           Asa           5       
+10      Walker, Nicholas      Max           3       
+11      Ross, Charlotte       Eve           0       
+12      Anthony, Eugene       Stan          8       
+13      Douglas, Jerry        John          5       
+14      Holbrook, Anna        Sharlene      7       
+15      Hammer, Jay           Fletcher      2       
+16      Sloan, Tina           Lillian       2       
+17      DuClos, Danielle      Lisa          3       
+18      Tuck, Jessica         Megan         3       
+19      Ashford, Matthew      Jack          0       
+21      Larson, Jill          Opal          8       
+22      McKinnon, Mary        Denise        7       
+23      Barr, Julia           Brooke        8       
+24      Borlenghi, Matt       Brian         8       
+25      Hughes, Finola        Anna          1       
+26      Rogers, Tristan       Robert        1       
+27      Richardson, Cheryl    Jenny         1       
+28      Evans, Mary Beth      Kayla         0       
+
+Number of records: 27
+
+>>> delete stars where stars.soapid = 5;
+Relation: stars attrName: soapid op: 2 type: 1 attrValue: 5
+
+>>> select (stars.starid, stars.real_name, stars.plays, stars.soapid) where stars.soapid = 5;
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+4       Cooper, Jeanne        Katherine     5       
+8       Hutchinson, Fiona     Gabrielle     5       
+9       Carey, Phil           Asa           5       
+13      Douglas, Jerry        John          5       
+
+Number of records: 4
+
+>>> print stars;
+Relation name: stars
+
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+0       Hayes, Kathryn        Kim           6       
+1       DeFreitas, Scott      Andy          6       
+2       Grahn, Nancy          Julia         4       
+4       Cooper, Jeanne        Katherine     5       
+7       Elliot, Patricia      Renee         3       
+8       Hutchinson, Fiona     Gabrielle     5       
+9       Carey, Phil           Asa           5       
+10      Walker, Nicholas      Max           3       
+11      Ross, Charlotte       Eve           0       
+12      Anthony, Eugene       Stan          8       
+13      Douglas, Jerry        John          5       
+14      Holbrook, Anna        Sharlene      7       
+17      DuClos, Danielle      Lisa          3       
+18      Tuck, Jessica         Megan         3       
+19      Ashford, Matthew      Jack          0       
+21      Larson, Jill          Opal          8       
+22      McKinnon, Mary        Denise        7       
+23      Barr, Julia           Brooke        8       
+24      Borlenghi, Matt       Brian         8       
+25      Hughes, Finola        Anna          1       
+26      Rogers, Tristan       Robert        1       
+27      Richardson, Cheryl    Jenny         1       
+28      Evans, Mary Beth      Kayla         0       
+
+Number of records: 23
+
+>>> print soaps;
+Relation name: soaps
+
+soapid name                 network rating 
+------  --------------------  -------  ------  
+0       Days of Our Lives     NBC      7.02    
+1       General Hospital      ABC      9.81    
+2       Guiding Light         CBS      4.02    
+3       One Life to Live      ABC      2.31    
+4       Santa Barbara         NBC      6.44    
+5       The Young and the Re  CBS      5.50    
+6       As the World Turns    CBS      7.00    
+7       Another World         NBC      1.97    
+8       All My Children       ABC      8.82    
+
+Number of records: 9
+
+>>> delete soaps where soaps.rating < 6.000000;
+Relation: soaps attrName: rating op: 0 type: 2 attrValue: 6.000000
+
+>>> select (soaps.soapid) where soaps.rating = 6.000000;
+Creating relation Tmp_Minirel_Result
+Doing QU_Select 
+Doing HeapFileScan Selection using ScanSelect()
+Relation name: Tmp_Minirel_Result
+
+soapid 
+------  
+
+Number of records: 0
+
+>>> print soaps;
+Relation name: soaps
+
+soapid name                 network rating 
+------  --------------------  -------  ------  
+0       Days of Our Lives     NBC      7.02    
+1       General Hospital      ABC      9.81    
+3       One Life to Live      ABC      2.31    
+4       Santa Barbara         NBC      6.44    
+5       The Young and the Re  CBS      5.50    
+6       As the World Turns    CBS      7.00    
+7       Another World         NBC      1.97    
+8       All My Children       ABC      8.82    
+
+Number of records: 8
+
+>>> delete soaps;
+Relation: soaps attrName:  op: 0 type: 0 attrValue: 
+>>> delete stars;
+
+>>> print soaps;
+soapid name                 network rating 
+------  --------------------  -------  ------  
+
+>>> print stars;
+starid real_name            plays        soapid 
+------  --------------------  ------------  ------  
+
+>>> Enter y if you want to delete testdb/*
+Executing rm -r testdb
+running test # 9 ****************
+Database testdb created
+Welcome to Minirel
+    Using Nested Loops Join Method
+
+>>> create rel500 (unique1 = int, unique2 = int, hundred1 = int, hundred2 = int, dummy = char(84));
+Creating relation rel500
+
+>>> Segmentation fault (core dumped)
+Enter y if you want to delete testdb/*
+Executing rm -r testdb
