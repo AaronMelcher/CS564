@@ -20,9 +20,16 @@ const Status QU_Delete(const string & relation,
 	cout << "Relation: " << relation << " attrName: " << attrName << " op: " << op << " type: " << type << " attrValue: " << attrValue << endl;
 	Status status;
 
-	HeapFileScan scan(relation, status);
+	if (relation == "") {
+		return BADSCANPARM;
+	}
 
-	if (attrName == "" || relation == "") {
+	HeapFileScan scan(relation, status);
+	if (status != OK) {
+		return status;
+	}
+
+	if (attrName == "") {
 		status = scan.startScan(0, 0, type, nullptr, op);
 	} else {
 		AttrDesc attr;
@@ -55,7 +62,7 @@ const Status QU_Delete(const string & relation,
 
 	RID rid;
 	// Loop to find matches and delete them
-    while ((status = scan.scanNext(rid)) == OK) {
+    while (scan.scanNext(rid) == OK) {
 		status = scan.deleteRecord();
 		if (status != OK) {
 			scan.endScan();

@@ -8,16 +8,6 @@
 #include "page.h"
 #include "buf.h"
 
-// buffer pool hash table implementation
-
-int BufHashTbl::hash(const File* file, const int pageNo)
-{
-  int tmp, value;
-  tmp = (int)(long)file;  // cast of pointer to the file object to an integer
-  value = (tmp + pageNo) % HTSIZE;
-  return value;
-}
-
 
 BufHashTbl::BufHashTbl(int htSize)
 {
@@ -26,6 +16,14 @@ BufHashTbl::BufHashTbl(int htSize)
   ht = new hashBucket* [htSize];
   for(int i=0; i < HTSIZE; i++)
     ht[i] = NULL;
+}
+
+int BufHashTbl::hash(const File* file, const int pageNo)
+{
+ long tmp, value;
+ tmp = (long)file; // cast of pointer to the file object to an integer
+ value = ((tmp + pageNo) % HTSIZE + HTSIZE) % HTSIZE;
+ return value;
 }
 
 
