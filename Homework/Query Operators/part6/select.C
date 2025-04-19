@@ -167,7 +167,7 @@ const Status ScanSelect(const string & result,
 		// For each attribute, copy corresponding bytes from the record
 		// Get items from the catalog
 		for(int i = 0; i < projCnt; i++){
-			memcpy(projTuple + destOffset, rec.data + projNames[i].attrOffset, projNames[i].attrLen);
+			memcpy(projTuple + destOffset, (char *)rec.data + projNames[i].attrOffset, projNames[i].attrLen);
 			destOffset += projNames[i].attrLen;
 		}
 

@@ -38,29 +38,27 @@ const Status QU_Insert(const string & relation,
 
 	// find all values for each attribute in the schema
 	// and copy into the tuple buffer
-	for(int i = 0; i < fullAttrCnt; i++){
+	for(int i = 0; i < fullAttrCnt; i++) {
 		const char *attrName = fullAttrs[i].attrName;
 
 		for(int j = 0; j < attrCnt; j++) {
-
-			Datatype type = (Datatype)attrList[j].attrType;
-			const char *attrValue = (char*)attrList[j].attrValue;
-
-			if (type == INTEGER) {
-				// make integer
-				int intVal = std::atoi(attrValue);
-				memcpy(tuple + fullAttrs[i].attrOffset, (char*)&intVal, fullAttrs[i].attrLen);
+			if (strcmp(attrList[j].attrName, attrName) == 0) {
+				Datatype type = (Datatype) attrList[j].attrType;
+				const char * attrValue = (char*) attrList[j].attrValue;
+				if (type == INTEGER) {
+					// make integer
+					int intVal = std::atoi(attrValue);
+					memcpy(tuple + fullAttrs[i].attrOffset, (char*)&intVal, fullAttrs[i].attrLen);
+				} else if (type == FLOAT) {
+					// make float
+					float fltVal = std::atof(attrValue);
+					memcpy(tuple + fullAttrs[i].attrOffset, (char*)&fltVal, fullAttrs[i].attrLen);
+				} else {
+					memcpy(tuple + fullAttrs[i].attrOffset, attrValue, fullAttrs[i].attrLen);
+				}
 				found = true;
-			} else if (type == FLOAT) {
-				// make float
-				float fltVal = std::atof(attrValue);
-				memcpy(tuple + fullAttrs[i].attrOffset, (char*)&fltVal, fullAttrs[i].attrLen);
-                found = true;
-			} else {
-				memcpy(tuple + fullAttrs[i].attrOffset, attrValue, fullAttrs[i].attrLen);
-				found = true;
+				break;
 			}
-			break;
 		}
 	}
 
