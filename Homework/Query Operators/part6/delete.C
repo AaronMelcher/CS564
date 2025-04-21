@@ -72,10 +72,6 @@ const Status QU_Delete(const string & relation,
 		// Start scan
 		status = scan.startScan(filterOffset, filterLen, type, filterPtr, op);
 		
-		// housekeeping
-		if(strBuf)
-			delete [] strBuf;
-		
 		if(status != OK)
 			return status;
 	} else {
