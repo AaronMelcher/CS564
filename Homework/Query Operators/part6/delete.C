@@ -20,7 +20,7 @@ const Status QU_Delete(const string & relation,
 	//cout << "Relation: " << relation << " attrName: " << attrName << " op: " << op << " type: " << type << " attrValue: " << attrValue << endl;
 	Status status;
 
-	if (relation == "") {
+	if (relation.empty()) {
 		return BADSCANPARM;
 	}
 
@@ -29,51 +29,79 @@ const Status QU_Delete(const string & relation,
 		return status;
 	}
 
-	if (attrName == "") {
-		status = scan.startScan(0, 0, type, nullptr, op);
-	} else {
-		AttrDesc attr;
-		status = attrCat->getInfo(relation, attrName, attr);
-		if (status != OK) {
-			return status;
-		}
+	// prep filter info
+	int intVal = 0;
+	float floatVal = 0;
+	char *strBuf = nullptr;
+	const char *filterPtr = nullptr;
+	int filterLen = 0;
+	int filterOffset = 0;
 
-		if (type == INTEGER) {
-			// make integer
-			int intVal = std::atoi(attrValue);
-			status = scan.startScan(attr.attrOffset, attr.attrLen, type, (char*)&intVal, op);
-            if (status != OK) {
-               return status;
-            }
-		} else if (type == FLOAT) {
-			// make float
-			float fltVal = std::atof(attrValue);
-			status = scan.startScan(attr.attrOffset, attr.attrLen, type, (char*)&fltVal, op);
-            if (status != OK) {
-               return status;
-            }
-		} else {
-			status = scan.startScan(attr.attrOffset, attr.attrLen, type, attrValue, op);
-	        if (status != OK) {
-	           return status;
-	        }
+	if(!attrName.empty()){
+		// lookup attr
+		AttrDesc desc;
+		status = attrCat->getInfo(relation, attrName, desc);
+		if(status!=OK) 
+			return status;
+
+		// type check
+		if(type != (Datatype)desc.attrType || desc.attrLen == 0)
+			return ATTRTYPEMISMATCH;
+
+		filterOffset = desc.attrOffset;
+		filterLen = desc.attrLen;
+
+		switch(type) {
+			case INTEGER:
+				intVal = atoi(attrValue);
+				filterPtr = (char*)&intVal;
+				break;
+			case FLOAT:
+				floatVal = atof(attrValue);
+				filterPtr = (char*)&floatVal;
+				break;
+			case STRING:
+				strBuf = new char[filterLen];
+				memset(strBuf, 0, filterLen);
+				strncpy(strBuf, attrValue, filterLen);
+				filterPtr = strBuf;
+				break;
+			default:
+				return BADSCANPARM;
 		}
+		// Start scan
+		status = scan.startScan(filterOffset, filterLen, type, filterPtr, op);
+		
+		// housekeeping
+		if(strBuf)
+			delete [] strBuf;
+		
+		if(status != OK)
+			return status;
+	} else {
+		status = scan.startScan(0, 0, type, nullptr, op); // or should be STRING and EQ for type and op?
+		if(status != OK)
+			return status;
 	}
 
+	// perform deletion
+	Status next;
 	RID rid;
-	// Loop to find matches and delete them
-    while (scan.scanNext(rid) == OK) {
+	while((next = scan.scanNext(rid)) == OK){
 		status = scan.deleteRecord();
-		if (status != OK) {
+		if(status != OK){
 			scan.endScan();
 			return status;
 		}
 	}
 
-    // End scan
-    scan.endScan();
-	return OK;
+	if(next != FILEEOF){
+		scan.endScan();
+		return next;
+	}
 
+	Status end = scan.endScan();
+	return end; 
 }
 
 
