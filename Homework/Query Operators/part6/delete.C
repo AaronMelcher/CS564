@@ -79,7 +79,7 @@ const Status QU_Delete(const string & relation,
 		if(status != OK)
 			return status;
 	} else {
-		status = scan.startScan(0, 0, type, nullptr, op); // or should be STRING and EQ for type and op?
+		status = scan.startScan(0, 0, STRING, nullptr, EQ); // or should be STRING and EQ for type and op?
 		if(status != OK)
 			return status;
 	}
