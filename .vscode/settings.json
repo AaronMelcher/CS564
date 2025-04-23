@@ -6,6 +6,9 @@
         "testbuf.C": "cpp",
         "error.C": "cpp",
         "testfile.C": "cpp",
-        "heapfile.C": "cpp"
+        "heapfile.C": "cpp",
+        "delete.C": "cpp",
+        "insert.C": "cpp",
+        "select.C": "cpp"
     }
 }
